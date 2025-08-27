@@ -1,1 +1,0 @@
-# TODO: K8s adapter
