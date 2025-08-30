@@ -18,4 +18,3 @@ class Agent:
 
     def run(self, ctx: AgentContext) -> AgentResult:
         raise NotImplementedError("Agent must implement run()")
-

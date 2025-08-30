@@ -7,7 +7,7 @@ from .common import Severity
 class IncidentSignal(BaseModel):
     source: str                 # "metrics" | "logs" | "alert"
     label: str                  # e.g., "http_5xx_rate", "latency_p95"
-    value: float                # numeric where possible
+    value: float
     unit: Optional[str] = None  # e.g., "ms", "percent", "rps"
     window_s: Optional[int] = None
     at: datetime = Field(default_factory=datetime.utcnow)
@@ -25,6 +25,10 @@ class RemediationCandidate(BaseModel):
     rollback: List[str] = Field(default_factory=list)
     rationale: str = ""
     predicted_impact: Dict[str, Any] = Field(default_factory=dict)
+    actions: List[Dict[str, Any]] = Field(default_factory=list)
+    # Policy Guard outputs
+    policy_status: str = "unknown"               # allowed | needs_approval | blocked | unknown
+    policy_reasons: List[str] = Field(default_factory=list)
 
 class ValidationResult(BaseModel):
     candidate: str

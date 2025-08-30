@@ -1,16 +1,16 @@
 from __future__ import annotations
-from loguru import logger
 from typing import List, Dict, Any
+from loguru import logger
 from .base import Agent, AgentContext, AgentResult
 from ..models.common import AgentName
 from ..models.incident import Incident, RemediationCandidate, IncidentSignal
 
 def _has_label(signals: List[IncidentSignal], needle: str) -> bool:
-    return any(needle in s.label.lower() for s in signals)
+    return any(needle in (s.label or "").lower() for s in signals)
 
 def _get_value(signals: List[IncidentSignal], label_contains: str, default: float = 0.0) -> float:
     for s in signals:
-        if label_contains in s.label.lower():
+        if label_contains in (s.label or "").lower():
             try:
                 return float(s.value)
             except Exception:
@@ -85,7 +85,7 @@ class RemediatorAgent(Agent):
                 predicted_impact={"error_rate": "-60%", "latency_p95": "-25%"},
             ))
 
-        # Heuristic 3: cache stampede / external API path
+        # Heuristic 3: cache stampede
         if "cache" in cause or "stampede" in cause:
             candidates.append(RemediationCandidate(
                 name="Mitigate cache stampede",
@@ -100,4 +100,51 @@ class RemediatorAgent(Agent):
                     {"action_type": "cache.config", "resource": "swr", "target": inc.service, "requires_approval": True},
                 ],
                 risks=["Cache growth and staleness"],
-                rollback=["Revert TTL & SWR sett]()
+                rollback=["Revert TTL & SWR settings"],
+                rationale="Classic stampede mitigations reduce load on origin quickly.",
+                predicted_impact={"origin_qps": "-30%", "latency_p95": "-15%"},
+            ))
+
+        # Heuristic 4: external API degradation
+        if "external api" in cause or "timeout" in cause:
+            candidates.append(RemediationCandidate(
+                name="Harden external API calls",
+                steps=[
+                    "Set timeouts & retries with backoff",
+                    "Add circuit breaker on the provider",
+                    "Serve cached fallback on failure",
+                ],
+                actions=[
+                    {"action_type": "traffic.policy", "resource": "timeout_retry", "target": "ext_api", "requires_approval": True},
+                    {"action_type": "traffic.policy", "resource": "circuit_breaker", "target": "ext_api", "requires_approval": True},
+                    {"action_type": "response.fallback", "resource": "cache", "target": "ext_api", "requires_approval": False},
+                ],
+                risks=["Potential increased timeouts if misconfigured"],
+                rollback=["Restore previous retry/timeout; disable breaker"],
+                rationale="Downstream instability should be isolated and degraded gracefully.",
+                predicted_impact={"error_rate": "-50%", "latency_p95": "-20%"},
+            ))
+
+        # Fallback
+        if not candidates:
+            candidates.append(RemediationCandidate(
+                name="Safe restart & monitor",
+                steps=[
+                    "Restart pods in rolling fashion",
+                    "Run smoke tests",
+                    "Watch 5xx & p95 for 10 minutes",
+                ],
+                actions=[
+                    {"action_type": "k8s.restart", "resource": "deployment", "target": inc.service, "requires_approval": True},
+                    {"action_type": "test.run_smoke", "resource": "pipeline", "target": inc.service, "requires_approval": False},
+                    {"action_type": "traffic.monitor", "resource": "metrics", "target": ["5xx", "latency_p95"], "requires_approval": False},
+                ],
+                risks=["Short-lived unavailability if HPA thresholds are tight"],
+                rollback=["Cancel restart; scale up replicas"],
+                rationale="When the cause is unclear, a controlled restart + monitoring is low-risk.",
+                predicted_impact={"error_rate": "-20%", "latency_p95": "-10%"},
+            ))
+
+        inc.remediation_candidates = candidates
+        logger.info("Remediator proposed {} candidates for {}", len(candidates), inc.id)
+        return AgentResult(agent=self.name, ok=True, data=inc, message=f"{len(candidates)} candidates proposed")

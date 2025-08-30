@@ -1,33 +1,39 @@
 from __future__ import annotations
 from typing import List, Tuple, Optional, Dict, Any
 from loguru import logger
+import os
 
 def _norm_score_from_distance(d: float | None) -> float:
-    # Chroma returns a distance (lower is better). Convert to a similarity-like score.
     if d is None:
         return 0.0
     try:
         d = float(d)
     except Exception:
         return 0.0
-    return 1.0 / (1.0 + d)  # monotonic in [0, 1] for common distances
+    return 1.0 / (1.0 + d)
 
 class VectorStore:
     """Chroma persistent store if available; fallback to in-memory."""
     def __init__(self, persist_dir: str):
         self.persist_dir = persist_dir
         self._mem: List[Tuple[str, str, Optional[str]]] = []  # (title, text, uri)
+        self._use_chroma = False
+        self._chroma = None
+        self._coll = None
+
+        coll_name = os.getenv("CHROMA_COLLECTION", "kb_docs")
         try:
             from chromadb import Client
             from chromadb.config import Settings
-            self._chroma = Client(Settings(is_persistent=True, persist_directory=persist_dir))
-            self._coll = self._chroma.get_or_create_collection("kb")
+            self._chroma = Client(Settings(
+                is_persistent=True,
+                persist_directory=persist_dir,
+                anonymized_telemetry=False,   # silence noisy telemetry
+            ))
+            self._coll = self._chroma.get_or_create_collection(coll_name)
             self._use_chroma = True
-            logger.info("Chroma vector DB initialized at {}", persist_dir)
+            logger.info("Chroma vector DB initialized at {} (collection={})", persist_dir, coll_name)
         except Exception as e:
-            self._use_chroma = False
-            self._chroma = None
-            self._coll = None
             logger.warning("Chroma unavailable ({}). Using in-memory store.", e)
 
     def add(self, title: str, text: str, metadata: Optional[Dict[str, Any]] = None, doc_id: Optional[str] = None):
@@ -40,10 +46,10 @@ class VectorStore:
 
     def search(self, query: str, k: int = 5, min_score: float = 0.0) -> List[Tuple[str, str, float, Optional[str]]]:
         """
-        Returns a list of (title, text, score, uri), sorted by score desc, de-duplicated by uri->title.
+        Returns a list of (title, text, score, uri), sorted by score desc,
+        de-duplicated by uri and by title (case-insensitive).
         """
         if self._use_chroma:
-            # pull extra to allow de-dup then trim
             res = self._coll.query(query_texts=[query], n_results=max(k * 2, k))
             docs = res.get("documents", [[]])[0]
             metas = res.get("metadatas", [[]])[0]
@@ -55,25 +61,26 @@ class VectorStore:
                 score = _norm_score_from_distance(dist)
                 raw.append((title, d, score, uri))
         else:
-            # fallback: naive substring count as score
             counts = []
             ql = query.lower()
             for title, text, uri in self._mem:
                 counts.append((title, text, float(text.lower().count(ql)), uri))
-            # normalize counts to ~[0,1]
-            maxc = max((c for *_rest, c, __ in [(t, x, sc, u) for (t,x,sc,u) in counts]), default=1.0)
+            maxc = max((sc for (_, _, sc, _) in counts), default=1.0)
             raw = [(t, x, (sc / maxc if maxc > 0 else 0.0), u) for (t, x, sc, u) in counts]
 
-        # filter by score, de-dup (prefer by uri, fallback to title)
+        # Filter + de-dup
         seen_keys = set()
+        seen_titles = set()
         out: List[Tuple[str, str, float, Optional[str]]] = []
         for t, txt, sc, uri in sorted(raw, key=lambda r: r[2], reverse=True):
             if sc < min_score:
                 continue
             key = f"uri::{uri}" if uri else f"title::{t}"
-            if key in seen_keys:
+            title_key = (t or "").strip().lower()
+            if key in seen_keys or title_key in seen_titles:
                 continue
             seen_keys.add(key)
+            seen_titles.add(title_key)
             out.append((t, txt, sc, uri))
             if len(out) >= k:
                 break

@@ -1,36 +1,58 @@
+# app/core/config.py
 from __future__ import annotations
-from pydantic import BaseModel
-from dotenv import load_dotenv
-from functools import lru_cache
-from pathlib import Path
-import os
+from typing import Optional
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-load_dotenv()
+class Settings(BaseSettings):
+    # ---- app meta ----
+    app_env: str = "dev"       # dev|staging|prod
+    log_level: str = "INFO"
 
-class Settings(BaseModel):
-    app_env: str = os.getenv("APP_ENV", "dev")
-    log_level: str = os.getenv("LOG_LEVEL", "INFO")
-    openai_api_key: str | None = os.getenv("OPENAI_API_KEY")
+    # ---- API & RAG knobs ----
+    openai_api_key: Optional[str] = None
+    vector_db_dir: str = "./kb/index"
+    chroma_collection: str = "kb_docs"
+    prometheus_url: str = "http://localhost:9090"
+    vite_api_url: str = "/api"
 
-    # Resolve VECTOR_DB_DIR relative to the package root (backend/app/)
-    _pkg_root = Path(__file__).resolve().parents[1]  # .../backend/app
-    _default_vec = (_pkg_root / "kb" / "index").as_posix()
-    _env_vec = os.getenv("VECTOR_DB_DIR", "").strip()
+    # ---- Knowledge base / RAG (NEW defaults so pipeline never crashes) ----
+    kb_min_docs: int = 1                  # pipeline checks this at startup
+    kb_watch_dir: str = "./kb/dropbox"    # optional; only used if you implement watch
+    rag_top_k: int = 8
+    rag_fetch_k: int = 24
+    rag_min_score: float = 0.0            # set higher if you want a threshold later
 
-    if _env_vec:
-        vector_db_dir: str = (_env_vec if os.path.isabs(_env_vec)
-                              else (_pkg_root / _env_vec).as_posix())
-    else:
-        vector_db_dir: str = _default_vec
+    # ---- policy / approvals ----
+    high_risk_actions_csv: str = ""                    # e.g. "delete_db,drop_table"
+    needs_approval_actions_csv: str = ""               # e.g. "restart_service"
+    nonprod_envs_csv: str = "dev,staging"
+    allow_manual_approval: bool = True
 
-    # Optional adapters
-    prometheus_url: str | None = os.getenv("PROMETHEUS_URL")
-    git_token: str | None = os.getenv("GIT_TOKEN")
-    k8s_context: str | None = os.getenv("K8S_CONTEXT")
+    # ---- database (async for app; sync for Alembic) ----
+    database_url: str = "sqlite+aiosqlite:///./data/app.db"
+    alembic_database_url: Optional[str] = None
 
-    # KB sanity minimum
-    kb_min_docs: int = int(os.getenv("KB_MIN_DOCS", "5"))
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",        # ignore unknown keys in .env
+        case_sensitive=False,  # DATABASE_URL or database_url both fine
+    )
 
-@lru_cache
+    @property
+    def alembic_url(self) -> str:
+        if self.alembic_database_url:
+            return self.alembic_database_url
+        return (
+            self.database_url
+            .replace("postgresql+asyncpg", "postgresql+psycopg")
+            .replace("sqlite+aiosqlite", "sqlite")
+        )
+
+# Singleton accessor
+_settings: Optional[Settings] = None
 def get_settings() -> Settings:
-    return Settings()
+    global _settings
+    if _settings is None:
+        _settings = Settings()
+    return _settings

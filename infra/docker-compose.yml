@@ -1,21 +1,62 @@
+version: "3.9"
+
 services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: air
+      POSTGRES_PASSWORD: air
+      POSTGRES_DB: air
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U air -d air"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   api:
     build:
       context: ..
       dockerfile: backend/Dockerfile
     working_dir: /app
     environment:
-      PYTHONPATH: /app        # ensures `import app.*` works
+      PYTHONPATH: /app
+      CHROMA_COLLECTION: ${CHROMA_COLLECTION:-kb_docs}
+      ANONYMIZED_TELEMETRY: "False"
+      CHROMA_DISABLE_TELEMETRY: "1"
+      # DB URLs are read by your app / alembic env.py via .env too
     volumes:
-      - ../backend:/app       # host backend -> container /app (contains /app/app/…)
-    # Use your real env file; ensure it exists. Or comment this out.
+      - ../backend:/app
     env_file:
       - ../backend/.env
+    command: >
+      bash -lc "
+        if [ -f alembic.ini ]; then
+          alembic upgrade head || echo 'Alembic not configured; continuing';
+        else
+          echo 'alembic.ini not found; skipping migrations';
+        fi;
+        uvicorn app.api.main:app --host 0.0.0.0 --port 8000
+      "
     ports:
       - "8000:8000"
+    healthcheck:
+      # use curl; give the app a long warm-up window (embeddings load)
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/healthz >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 120s   # <— IMPORTANT: plenty of time for first boot
     depends_on:
-      - chroma
-    # restart: unless-stopped   # optional
+      db:
+        condition: service_healthy
+      chroma:
+        condition: service_started
+      otel:
+        condition: service_started
 
   ui:
     build:
@@ -24,26 +65,40 @@ services:
     working_dir: /app
     environment:
       NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "1"   # helps file watching on Docker/Windows
+      CHOKIDAR_USEPOLLING: "1"
     volumes:
       - ../ui:/app
-      - ui_node_modules:/app/node_modules  # keep deps inside container
+      - ui_node_modules:/app/node_modules
     command: >
-      sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5173"
+      sh -c "npm ci --no-audit --no-fund || npm install --no-audit --no-fund &&
+             npm run dev -- --host 0.0.0.0 --port 5173"
     ports:
       - "5173:5173"
     depends_on:
-      - api
-    # restart: unless-stopped   # optional
+      api:
+        # don't block UI on API health; proxy will retry
+        condition: service_started
 
   chroma:
     image: chromadb/chroma:latest
+    environment:
+      CHROMA_SERVER_HOST: "0.0.0.0"
+      CHROMA_SERVER_HTTP_PORT: "8001"
+      ANONYMIZED_TELEMETRY: "False"
     ports:
       - "8001:8001"
     volumes:
-      - chroma_data:/chroma/.chroma
-    # restart: unless-stopped   # optional
+      - chroma_data:/data
+
+  otel:
+    image: otel/opentelemetry-collector:0.103.1
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml:ro
+    ports:
+      - "4317:4317"
 
 volumes:
   chroma_data:
   ui_node_modules:
+  pgdata:

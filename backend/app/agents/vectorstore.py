@@ -1,14 +1,12 @@
 from typing import List, Tuple
 from loguru import logger
-import os
 
 class VectorStore:
-    """Thin wrapper. Uses Chroma if available; otherwise holds docs in-memory."""
+    """Thin wrapper. Uses Chroma if available; otherwise stores docs in-memory."""
     def __init__(self, persist_dir: str):
         self.persist_dir = persist_dir
-        self._mem: List[Tuple[str, str]] = []  # (title, text)
+        self._mem: List[Tuple[str, str]] = []
         try:
-            import chromadb  # noqa
             from chromadb import Client
             from chromadb.config import Settings
             self._chroma = Client(Settings(is_persistent=True, persist_directory=persist_dir))
@@ -30,11 +28,14 @@ class VectorStore:
     def search(self, query: str, k: int = 3) -> List[Tuple[str, str, float]]:
         if self._use_chroma:
             res = self._coll.query(query_texts=[query], n_results=k)
+            docs = res.get("documents", [[]])[0]
+            metas = res.get("metadatas", [[]])[0]
+            dists = res.get("distances", [[]])[0]
             out = []
-            for d, m, s in zip(res.get("documents", [[]])[0], res.get("metadatas", [[]])[0], res.get("distances", [[]])[0]):
+            for d, m, s in zip(docs, metas, dists):
                 out.append((m.get("title", "doc"), d, float(s if s is not None else 0.0)))
             return out
-        # naive fallback: rank by substring count
+        # Fallback: naive substring score
         scored = []
         for title, text in self._mem:
             score = text.lower().count(query.lower())
