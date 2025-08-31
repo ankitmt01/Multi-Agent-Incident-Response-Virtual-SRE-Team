@@ -1,4 +1,3 @@
-# app/api/routers/demo.py
 from __future__ import annotations
 
 import csv
@@ -96,4 +95,4 @@ async def generate_incidents(
         return {"ok": True, "ids": ids}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"demo error: {e}")
-# ---------- /generate incidents ----------
+# ---------- /generate incidents -----------

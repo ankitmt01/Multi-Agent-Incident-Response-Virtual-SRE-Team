@@ -1,24 +1,35 @@
 from __future__ import annotations
 from typing import Optional
+
 from sqlalchemy import (
-    String, Integer, Float, Boolean, DateTime, ForeignKey, Enum, JSON, Text
+    String, Integer, Float, Boolean, DateTime, ForeignKey, JSON, Text, Enum
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 
+
+
+from app.models.common import Severity
+severity_enum = Enum(Severity, name="severity", create_type=True)
+# ...
+severity: Mapped[Optional[Severity]] = mapped_column(severity_enum, nullable=True)
+
+
+
 from app.core.db import Base
-from app.models.common import Severity  # your existing enum
 
 # Prefer JSONB on Postgres; fall back to JSON on SQLite
 JSONType = JSONB().with_variant(JSON(), "sqlite")
+
 
 class IncidentORM(Base):
     __tablename__ = "incidents"
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     service: Mapped[str] = mapped_column(String(200), index=True)
-    severity: Mapped[Optional[Severity]] = mapped_column(Enum(Severity), nullable=True)
+    # CHANGED: use String, not Enum(Severity)
+    severity: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), default=datetime.utcnow)
     suspected_cause: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(24), default="OPEN")
