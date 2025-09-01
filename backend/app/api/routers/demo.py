@@ -10,12 +10,19 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_session
-from app.repositories.incidents import IncidentRepository
 from app.models.incident import Incident, IncidentSignal
 from app.services.pipeline import PIPELINE
 
 router = APIRouter(prefix="/demo", tags=["demo"])
-repo = IncidentRepository()
+
+# Repo: class-based preferred, function-based fallback
+try:
+    from app.repositories.incidents import IncidentRepository
+    repo = IncidentRepository()
+    _class_repo = True
+except Exception:
+    from app.repositories import incidents as repo  # function-style
+    _class_repo = False
 
 
 # ---------- seed metrics ----------
@@ -71,8 +78,8 @@ async def generate_incidents(
             inc = Incident(
                 id=_new_id(),
                 service=body.service,
-                severity=None,
-                created_at=datetime.now(timezone.utc),
+                severity=None,  # will be filled by detector or left null
+                created_at=datetime.utcnow(),  # naive UTC to match DB column
                 status="OPEN",
                 suspected_cause="bad deploy",
                 signals=[
@@ -83,11 +90,24 @@ async def generate_incidents(
                 remediation_candidates=[],
                 validation_results=[],
             )
-            await repo.upsert(db, inc)
+
+            # write once so it appears immediately
+            if _class_repo and hasattr(repo, "upsert"):
+                await repo.upsert(db, inc)
+            else:
+                await repo.create_or_overwrite(db, inc)  # type: ignore
 
             if body.run_pipeline:
-                PIPELINE.run_all(inc)          # mutates inc in-place
-                await repo.upsert(db, inc)
+                PIPELINE.run_all(inc)  # mutates inc in-place
+
+                # ensure severity stored as string if enum-like
+                if getattr(inc, "severity", None) is not None and not isinstance(inc.severity, str):
+                    inc.severity = getattr(inc.severity, "value", str(inc.severity))
+
+                if _class_repo and hasattr(repo, "upsert"):
+                    await repo.upsert(db, inc)
+                else:
+                    await repo.create_or_overwrite(db, inc)  # type: ignore
 
             ids.append(inc.id)
 
@@ -95,4 +115,4 @@ async def generate_incidents(
         return {"ok": True, "ids": ids}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"demo error: {e}")
-# ---------- /generate incidents -----------
+# ---------- /generate incidents ----------

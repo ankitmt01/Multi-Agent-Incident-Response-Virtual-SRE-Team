@@ -1,12 +1,11 @@
-# app/api/main.py
 from __future__ import annotations
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from app.core.logging import setup_logging
 from app.core.config import get_settings
-from app.core.db import engine, Base
-from sqlalchemy.exc import OperationalError
 
 logger = setup_logging()
 settings = get_settings()
@@ -14,6 +13,10 @@ settings = get_settings()
 def create_app() -> FastAPI:
     app = FastAPI(title="Agentic Incident Response API", version="0.1.0")
 
+    # avoid 307 redirects breaking the UI fetches
+    app.router.redirect_slashes = False
+
+    # CORS (dev)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "*"],
@@ -22,17 +25,26 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # incidents router (singular or plural)
-    incidents_module = None
+    # Serve generated metrics CSVs (demo)
+    metrics_dir = "/app/data/metrics"
+    os.makedirs(metrics_dir, exist_ok=True)
+    app.mount("/metrics", StaticFiles(directory=metrics_dir), name="metrics")
+
+    # Incidents router (plural → singular fallback)
     try:
         from app.api.routers import incidents as _inc
-        incidents_module = _inc
+        app.include_router(_inc.router)
     except Exception:
-        from app.api.routers import incident as _inc  # fallback
-        incidents_module = _inc
-    app.include_router(incidents_module.router)
+        try:
+            from app.api.routers import incident as _inc
+            app.include_router(_inc.router)
+        except Exception as e:
+            raise RuntimeError(
+                "No incidents router found. Create app/api/routers/incident.py "
+                "or incidents.py with `router = APIRouter(...)`."
+            ) from e
 
-    # optional routers
+    # Optional routers; ignore if missing
     for modname in ("kb", "demo", "debug"):
         try:
             mod = __import__(f"app.api.routers.{modname}", fromlist=["router"])
@@ -41,21 +53,9 @@ def create_app() -> FastAPI:
         except Exception:
             pass
 
-    @app.on_event("startup")
-    async def _ensure_schema():
-        try:
-            # ⬇️ this import registers all ORM tables on Base.metadata
-            import app.models.sql  # noqa: F401
-            async with engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
-            logger.info("DB schema ensured (create_all).")
-        except OperationalError as e:
-            logger.error("DB not reachable at startup: %s", e)
-            # let container restart; that’s fine for dev
-
     @app.get("/healthz")
     def healthz():
-        return {"ok": True, "env": settings.app_env}
+        return {"ok": True}
 
     logger.info("App started in %s mode", settings.app_env)
     return app

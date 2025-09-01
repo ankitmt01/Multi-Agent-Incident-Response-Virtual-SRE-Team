@@ -1,4 +1,2 @@
-from . import incidents, demo
-
-__all__ = ["incidents", "demo"]
-    
+# app/api/routers/__init__.py
+__all__ = []

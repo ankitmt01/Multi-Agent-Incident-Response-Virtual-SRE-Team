@@ -1,21 +1,13 @@
 from __future__ import annotations
+
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy import (
-    String, Integer, Float, Boolean, DateTime, ForeignKey, JSON, Text, Enum
+    String, Integer, Float, Boolean, DateTime, ForeignKey, JSON, Text
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
-from datetime import datetime
-
-
-
-from app.models.common import Severity
-severity_enum = Enum(Severity, name="severity", create_type=True)
-# ...
-severity: Mapped[Optional[Severity]] = mapped_column(severity_enum, nullable=True)
-
-
 
 from app.core.db import Base
 
@@ -28,9 +20,15 @@ class IncidentORM(Base):
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     service: Mapped[str] = mapped_column(String(200), index=True)
-    # CHANGED: use String, not Enum(Severity)
+    # Store severity as a simple string to avoid Postgres ENUM headaches in dev
     severity: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=False), default=datetime.utcnow)
+
+    # Use tz-aware timestamps (TIMESTAMPTZ) and always write UTC
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
+
     suspected_cause: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(24), default="OPEN")
 
@@ -52,13 +50,20 @@ class IncidentSignalORM(Base):
     __tablename__ = "incident_signals"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    incident_id: Mapped[str] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
     source: Mapped[str] = mapped_column(String(50))
     label: Mapped[str] = mapped_column(String(200))
     value: Mapped[float] = mapped_column(Float)
     unit: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
     window_s: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    at: Mapped[datetime] = mapped_column(DateTime(timezone=False), default=datetime.utcnow)
+
+    # tz-aware, default to now UTC
+    at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+    )
 
     incident: Mapped[IncidentORM] = relationship(back_populates="signals")
 
@@ -67,7 +72,9 @@ class EvidenceItemORM(Base):
     __tablename__ = "incident_evidence"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    incident_id: Mapped[str] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
     title: Mapped[str] = mapped_column(String(300))
     content: Mapped[str] = mapped_column(Text)
     score: Mapped[float] = mapped_column(Float, default=0.0)
@@ -80,7 +87,9 @@ class RemediationCandidateORM(Base):
     __tablename__ = "remediation_candidates"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    incident_id: Mapped[str] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
     name: Mapped[str] = mapped_column(String(200))
     steps: Mapped[list[str]] = mapped_column(JSONType, default=list)
     risks: Mapped[list[str]] = mapped_column(JSONType, default=list)
@@ -98,7 +107,9 @@ class ValidationResultORM(Base):
     __tablename__ = "validation_results"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    incident_id: Mapped[str] = mapped_column(ForeignKey("incidents.id", ondelete="CASCADE"), index=True)
+    incident_id: Mapped[str] = mapped_column(
+        ForeignKey("incidents.id", ondelete="CASCADE"), index=True
+    )
     candidate: Mapped[str] = mapped_column(String(200))
     passed: Mapped[bool] = mapped_column(Boolean, default=False)
     notes: Mapped[str] = mapped_column(Text, default="")
