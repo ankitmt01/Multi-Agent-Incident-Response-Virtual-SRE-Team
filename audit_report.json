@@ -1,0 +1,169 @@
+{
+  "fastapi": {
+    "desc": "FastAPI app present",
+    "ok": true,
+    "files": [
+      "backend\\app\\main.py",
+      "backend\\app\\api\\main.py"
+    ]
+  },
+  "pydantic_incident": {
+    "desc": "Pydantic Incident model",
+    "ok": true,
+    "files": [
+      "backend\\app\\models\\incident.py",
+      "backend\\app\\repositories\\incidents.py",
+      "backend\\app\\services\\incidents_service.py",
+      "backend\\app\\api\\routers\\demo.py",
+      "backend\\app\\api\\routers\\incidents.py"
+    ]
+  },
+  "agents_framework": {
+    "desc": "Agents framework (LangGraph/AutoGen/CrewAI)",
+    "ok": false,
+    "files": []
+  },
+  "agent_detector": {
+    "desc": "Detector agent",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\detector.py",
+      "backend\\app\\services\\pipeline.py"
+    ]
+  },
+  "agent_investigator": {
+    "desc": "Investigator agent",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\investigator.py",
+      "backend\\app\\services\\pipeline.py"
+    ]
+  },
+  "agent_remediator": {
+    "desc": "Remediator agent",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\remediator.py",
+      "backend\\app\\services\\pipeline.py"
+    ]
+  },
+  "agent_validator": {
+    "desc": "Validator agent",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\validator.py",
+      "backend\\app\\services\\pipeline.py",
+      "backend\\app\\api\\routers\\debug.py"
+    ]
+  },
+  "agent_reporter": {
+    "desc": "Reporter agent",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\reporter.py",
+      "backend\\app\\services\\pipeline.py"
+    ]
+  },
+  "rag": {
+    "desc": "RAG components (Vector DB)",
+    "ok": true,
+    "files": [
+      "backend\\app\\adapters\\vectorstore.py",
+      "backend\\app\\agents\\vectorstore.py",
+      "backend\\app\\services\\rag.py"
+    ]
+  },
+  "git_ci": {
+    "desc": "Git/CI integration",
+    "ok": false,
+    "files": []
+  },
+  "k8s": {
+    "desc": "Kubernetes API usage",
+    "ok": false,
+    "files": []
+  },
+  "cloud_metrics": {
+    "desc": "Prometheus/OpenTelemetry adapters",
+    "ok": false,
+    "files": []
+  },
+  "policy": {
+    "desc": "Policy engine (OPA-style)",
+    "ok": true,
+    "files": [
+      "audit_report.json",
+      ".git\\index",
+      ".git\\hooks\\update.sample",
+      "ui\\src\\App.jsx",
+      "ui\\src\\DemoPanel.jsx"
+    ]
+  },
+  "slack": {
+    "desc": "Slack integration",
+    "ok": false,
+    "files": []
+  },
+  "jira": {
+    "desc": "Jira integration",
+    "ok": false,
+    "files": []
+  },
+  "dockerfile": {
+    "desc": "Dockerfile present",
+    "ok": true,
+    "files": [
+      "backend\\Dockerfile",
+      "ui\\Dockerfile"
+    ]
+  },
+  "compose": {
+    "desc": "Docker Compose",
+    "ok": true,
+    "files": [
+      "infra\\docker-compose.yml"
+    ]
+  },
+  "tests": {
+    "desc": "Smoke tests present",
+    "ok": true,
+    "files": [
+      "backend\\app\\agents\\remediator.py",
+      "backend\\app\\scripts\\seed_kb.py"
+    ]
+  },
+  "websockets": {
+    "desc": "WebSockets/live trace",
+    "ok": false,
+    "files": []
+  },
+  "ui_react": {
+    "desc": "UI (React)",
+    "ok": true,
+    "files": [
+      "ui\\package.json"
+    ]
+  },
+  "ui_vue": {
+    "desc": "UI (Vue)",
+    "ok": true,
+    "files": [
+      "ui\\package.json"
+    ]
+  },
+  "graph_libs": {
+    "desc": "Graph libs (networkx/igraph)",
+    "ok": false,
+    "files": []
+  },
+  "forecast_libs": {
+    "desc": "Forecasting (prophet/statsmodels/torch)",
+    "ok": false,
+    "files": []
+  },
+  "plotting": {
+    "desc": "Plotting (plotly/chart.js)",
+    "ok": false,
+    "files": []
+  }
+}
