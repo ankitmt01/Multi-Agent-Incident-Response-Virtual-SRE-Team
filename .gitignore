@@ -1,8 +1,31 @@
-.venv/
+# Python
 __pycache__/
 *.pyc
-.chroma/
-.env
-results/
-dist/
+*.pyo
+*.pyd
+.Python
 build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# pytest
+.pytest_cache/
+
+# IDEs / Editors
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
