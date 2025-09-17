@@ -1,0 +1,1299 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Incident Copilot — Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Social preview -->
+  <meta property="og:title" content="Incident Copilot — Console">
+  <meta property="og:description" content="Detect, triage, validate, and execute remediation plans with policy guardrails.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="/">
+  <meta property="og:image" content="/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Incident Copilot — Console">
+  <meta name="twitter:description" content="Detect, triage, validate, and execute remediation plans with policy guardrails.">
+  <meta name="twitter:image" content="/og.png">
+
+  <style>
+    :root { --bg:#0b1020; --fg:#e5e7eb; --muted:#94a3b8; --card:#0f172a; --accent:#22c55e;
+      --warn:#f59e0b; --danger:#ef4444; --border:#1f2937; --ink:#60a5fa; }
+    *{box-sizing:border-box}
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; background:var(--bg); color:var(--fg); }
+    header { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid var(--border); position:sticky; top:0; background:linear-gradient(180deg, rgba(15,23,42,.85), rgba(15,23,42,.7)); backdrop-filter: blur(6px); z-index:10; }
+    header .title{ font-weight:800; letter-spacing:.3px; display:flex; align-items:center; gap:10px; }
+    header .pill { font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; background:#0b1220; color:var(--muted); }
+    header .links a{ color:var(--muted); text-decoration:none; margin-left:16px; }
+    .container{ max-width:1200px; margin:24px auto; padding:0 16px; }
+    .tabs{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+    .tab{ padding:10px 14px; border:1px solid var(--border); border-radius:12px; background:var(--card); cursor:pointer; user-select:none; }
+    .tab.active{ outline:2px solid var(--ink); }
+    .tabpane.hidden{ display:none }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    .grid-3{ display:grid; grid-template-columns: 1.2fr .8fr .8fr; gap:16px; }
+    .card{ border:1px solid var(--border); border-radius:14px; background:linear-gradient(180deg,#0f172a 0%, #0b1220 100%); padding:16px; box-shadow: 0 10px 24px rgba(0,0,0,.25) inset; }
+    .card h3{ margin:0 0 10px }
+    .cand { border:1px solid var(--border); border-radius:10px; padding:10px; margin-bottom:10px; background:#0f172a; }
+    .cand.chosen { outline:2px solid var(--ink); box-shadow:0 0 0 2px rgba(96,165,250,.25) inset; }
+    .cand .ribbon { font-size:12px; padding:2px 8px; border:1px solid var(--border); border-radius:999px; background:#0b1220; color:var(--muted); }
+
+    button{ padding:10px 14px; border-radius:12px; border:1px solid var(--border); background:#0b1220; color:var(--fg); cursor:pointer; }
+    button.primary{ background:#14532d; border-color:#166534; }
+    button.ghost{ background:transparent; }
+    input, select, textarea { width:100%; padding:10px; border-radius:12px; border:1px solid var(--border); background:#0b1220; color:var(--fg); }
+    textarea{ min-height:110px; resize:vertical; }
+    label{ font-size:13px; color:var(--muted) }
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+    .row > div{ flex:1; min-width:220px; }
+    pre{ background:#0b1220; color:#e5e7eb; padding:12px; border-radius:12px; overflow:auto; max-height:55vh; border:1px solid var(--border); }
+    .badge{ display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; border:1px solid var(--border); background:#0b1220; }
+    .ok{ color:var(--accent) } .warn{ color:var(--warn) } .err{ color:var(--danger) }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ text-align:left; padding:10px; border-bottom:1px solid var(--border); font-size:14px; }
+    .muted{ color:var(--muted) }
+    a.link{ color:var(--ink); text-decoration:none; }
+    .right{ text-align:right }
+    .banner { position:sticky; top:64px; width:100%; padding:8px 16px; background:#7f1d1d; color:#fee2e2; border-bottom:1px solid #b91c1c; font-size:14px; display:none; z-index:9;}
+    .banner code{ background:rgba(0,0,0,.2); padding:2px 6px; border-radius:6px;}
+    /* Drawer */
+    .drawer{ position:fixed; top:0; right:-560px; width:560px; height:100vh; background:#0b1220; border-left:1px solid var(--border); box-shadow:-12px 0 30px rgba(0,0,0,.4); transition:right .25s ease; z-index:10000; display:flex; flex-direction:column;}
+    .drawer.open{ right:0; }
+    .drawer header{ position:sticky; top:0; background:#0b1220; padding:16px; border-bottom:1px solid var(--border); z-index:1;}
+    .drawer .content{ padding:16px; overflow:auto; }
+    .divider{ height:1px; background:var(--border); margin:12px 0; }
+    .pill-sm{ padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; background:#0f172a; color:var(--muted); }
+
+    /* Severity pills */
+    .sev-pill{ padding:2px 8px; border:1px solid var(--border); border-radius:999px; font-size:12px; display:inline-block; }
+    .sev-high{ background:#7f1d1d; color:#fecaca; border-color:#b91c1c;}
+    .sev-medium{ background:#3f2c07; color:#fde68a; border-color:#a16207;}
+    .sev-low{ background:#052e1d; color:#bbf7d0; border-color:#166534;}
+
+    /* Toasts */
+    .toasts{ position:fixed; bottom:16px; right:16px; display:flex; gap:8px; flex-direction:column; z-index:99999; }
+    .toast{ background:#0f172a; border:1px solid var(--border); color:var(--fg); padding:10px 12px; border-radius:12px; min-width:220px; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+
+    /* Modal (for step details) */
+    .modal.hidden{ display:none }
+    .modal{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:999999; }
+    .modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.6); }
+    .modal-card{ position:relative; width:min(740px, 92vw); max-height:80vh; overflow:auto; background:#0b1220; border:1px solid var(--border); border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.5); }
+    .modal-head{ display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--border); background:#0f172a; position:sticky; top:0; }
+    .modal-body{ padding:14px; }
+
+    /* Popover menu (Copy cURL) */
+    .menu-anchor{ position:relative; }
+    .menu{ position:absolute; top:36px; right:0; min-width:320px; background:#0f172a; border:1px solid var(--border); border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,.45); padding:8px; display:none; z-index:9999;}
+    .menu.open{ display:block; }
+    .menu h4{ margin:4px 6px 8px; font-size:13px; color:var(--muted); }
+    .menu .row{ margin:0; }
+    .menu textarea{ width:100%; min-height:70px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; }
+    .menu .btns{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px; }
+
+    /* Charts */
+    .chart-grid{ display:grid; grid-template-columns: 1.4fr .8fr; gap:16px; }
+    .spark-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; }
+    .spark{ border:1px solid var(--border); border-radius:12px; background:#0f172a; padding:10px; }
+    .spark h5{ margin:0 0 6px; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; }
+    canvas{ display:block; width:100%; height:auto; }
+  </style>
+</head>
+<body>
+<div id="banner" class="banner"></div>
+
+<header>
+  <div class="title">
+    <span>Incident Copilot</span>
+    <span class="pill">UI</span>
+  </div>
+  <div class="links">
+    <a class="link" href="/docs" target="_blank">API Docs</a>
+    <a class="link" href="/openapi.json" target="_blank">OpenAPI JSON</a>
+    <a class="link" href="/health" target="_blank">/health</a>
+    <a class="link" href="/status" target="_blank">/status</a>
+    <a class="link" href="/metrics" target="_blank">/metrics</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-tab="overview">Overview</div>
+    <div class="tab" data-tab="incidents">Incidents</div>
+    <div class="tab" data-tab="monitor">Monitoring</div>
+    <div class="tab" data-tab="create">Create</div>
+    <div class="tab" data-tab="report">Report</div>
+    <div class="tab" data-tab="kb">KB</div>
+    <div class="tab" data-tab="audit">Audit</div>
+    <div class="tab" data-tab="raw">Raw</div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+
+  <!-- Overview -->
+  <section id="overview" class="tabpane">
+    <div class="grid">
+      <div class="card">
+        <h3>Service Health</h3>
+        <div class="row">
+          <span id="uptime" class="badge">uptime: …</span>
+          <span id="kb" class="badge">kb: …</span>
+          <span id="counts" class="badge">incidents: … | results: …</span>
+        </div>
+        <pre id="status">(loading /status...)</pre>
+      </div>
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div class="row">
+          <button id="btn-detect" class="primary">Detect (demo)</button>
+          <button id="btn-approve">Approve latest</button>
+          <button id="btn-run">Run Pipeline (latest)</button>
+          <button id="btn-refresh">Refresh</button>
+        </div>
+        <p class="muted">Tip: Use <a class="link" href="/docs" target="_blank">/docs</a> to try APIs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Incidents -->
+  <section id="incidents" class="tabpane hidden">
+    <div class="card">
+      <h3>Incidents</h3>
+      <table id="incidents-table">
+        <thead>
+        <tr>
+          <th colspan="5">
+            <div class="row">
+              <div><input id="search" placeholder="Search ID / service / cause…" /></div>
+              <div>
+                <select id="severity">
+                  <option value="">All severities</option>
+                  <option>HIGH</option>
+                  <option>MEDIUM</option>
+                  <option>LOW</option>
+                </select>
+              </div>
+              <div>
+                <select id="sort">
+                  <option value="-created_at">Newest first</option>
+                  <option value="created_at">Oldest first</option>
+                  <option value="severity">By severity</option>
+                </select>
+              </div>
+              <div class="right">
+                <button id="prev">Prev</button>
+                <button id="next">Next</button>
+              </div>
+            </div>
+          </th>
+        </tr>
+        <tr><th>ID</th><th>Service</th><th>Severity</th><th>Created</th><th class="right">Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Monitoring -->
+  <section id="monitor" class="tabpane hidden">
+    <div class="card">
+      <h3>Live Metrics</h3>
+      <div class="chart-grid">
+        <div class="card" style="padding:12px;">
+          <h4 class="muted" style="margin:0 0 8px;">Incidents over time (from /metrics)</h4>
+          <canvas id="chart-incidents" width="800" height="260"></canvas>
+        </div>
+        <div class="card" style="padding:12px;">
+          <h4 class="muted" style="margin:0 0 8px;">Severity breakdown</h4>
+          <canvas id="chart-severity" width="480" height="260"></canvas>
+        </div>
+      </div>
+      <div class="spark-grid" style="margin-top:16px;">
+        <div class="spark">
+          <h5>Pipeline runs <span id="spark-pipeline-now" class="muted">—</span></h5>
+          <canvas id="spark-pipeline" width="240" height="60"></canvas>
+        </div>
+        <div class="spark">
+          <h5>Approvals <span id="spark-approvals-now" class="muted">—</span></h5>
+          <canvas id="spark-approvals" width="240" height="60"></canvas>
+        </div>
+        <div class="spark">
+          <h5>Executions <span id="spark-execs-now" class="muted">—</span></h5>
+          <canvas id="spark-execs" width="240" height="60"></canvas>
+        </div>
+        <div class="spark">
+          <h5>KB docs <span id="spark-kb-now" class="muted">—</span></h5>
+          <canvas id="spark-kb" width="240" height="60"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Create -->
+  <section id="create" class="tabpane hidden">
+    <div class="card">
+      <h3>Create Incident</h3>
+      <div class="row">
+        <div><label>Service</label><input id="svc" placeholder="e.g., checkout"/></div>
+        <div><label>Suspected Cause</label><input id="cause" placeholder="e.g., recent deploy"/></div>
+      </div>
+      <div class="row">
+        <div><label>5xx Rate (%)</label><input id="five" type="number" step="0.01" value="1.6"/></div>
+        <div><label>Latency p95 (ms)</label><input id="p95" type="number" step="1" value="1200"/></div>
+        <div><label>Window (s)</label><input id="win" type="number" step="1" value="60"/></div>
+      </div>
+      <div class="row">
+        <button id="btn-create" class="primary">Create</button>
+        <span id="create-msg" class="muted"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Report -->
+  <section id="report" class="tabpane hidden">
+    <div class="card">
+      <h3>Report (select from table or use latest)</h3>
+      <div class="row">
+        <button id="btn-load-report">Load Latest Report</button>
+        <button id="btn-download-md">Download Markdown (latest)</button>
+        <button id="btn-download-pdf">Download PDF (latest)</button>
+      </div>
+      <div class="grid">
+        <div>
+          <h4 class="muted">Markdown</h4>
+          <pre id="report-pre">(none)</pre>
+        </div>
+        <div>
+          <h4 class="muted">Preview</h4>
+          <div id="report-html" style="background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:12px;min-height:100px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KB -->
+  <section id="kb" class="tabpane hidden">
+    <div class="grid-3">
+      <div class="card">
+        <h3>KB Stats</h3>
+        <div class="row">
+          <span id="kb-count" class="badge">count: …</span>
+          <span id="kb-vecdir" class="badge">dir: …</span>
+        </div>
+        <pre id="kb-stats-pre">(loading /kb/stats...)</pre>
+      </div>
+      <div class="card">
+        <h3>Ingest: Text</h3>
+        <div class="row">
+          <div><label>Title</label><input id="kb-text-title" placeholder="Doc title"></div>
+          <div><label>Service (optional)</label><input id="kb-text-service" placeholder="e.g., checkout"></div>
+        </div>
+        <div class="row"><div><label>URI (optional)</label><input id="kb-text-uri" placeholder="e.g., runbook.md"></div></div>
+        <div><label>Text</label><textarea id="kb-text-body" placeholder="Paste content…"></textarea></div>
+        <div class="row"><button id="kb-text-submit" class="primary">Add</button></div>
+      </div>
+      <div class="card">
+        <h3>Ingest: URL</h3>
+        <div class="row">
+          <div><label>URL</label><input id="kb-url-url" placeholder="https://…"></div>
+          <div><label>Title (optional)</label><input id="kb-url-title" placeholder="Friendly title"></div>
+          <div><label>Service (optional)</label><input id="kb-url-service" placeholder="e.g., checkout"></div>
+        </div>
+        <div class="row"><button id="kb-url-submit" class="primary">Add</button></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3>KB Documents</h3>
+      <table id="kb-table">
+        <thead><tr><th>ID</th><th>Title</th><th>Service</th><th>URI</th><th class="right">Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Audit -->
+  <section id="audit" class="tabpane hidden">
+    <div class="card">
+      <h3>Audit Stream</h3>
+      <div class="row">
+        <button id="audit-connect" class="primary">Connect</button>
+        <button id="audit-disconnect">Disconnect</button>
+        <span class="muted">SSE: <code>/audit/stream</code></span>
+      </div>
+      <pre id="audit-pre">(disconnected)</pre>
+    </div>
+  </section>
+
+  <!-- Raw -->
+  <section id="raw" class="tabpane hidden">
+    <div class="grid">
+      <div class="card">
+        <h3>/health</h3>
+        <pre id="health-pre">(loading...)</pre>
+      </div>
+      <div class="card">
+        <h3>/metrics</h3>
+        <pre id="metrics-pre">(loading...)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings -->
+  <section id="settings" class="tabpane hidden">
+    <div class="card">
+      <h3>Settings</h3>
+      <div class="row">
+        <div><label>API Key (sent as <code>X-API-Key</code>)</label><input id="set-apikey" placeholder="match backend .env API_KEY"/></div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Auth Mode</label>
+          <select id="set-authmode">
+            <option value="api_key">API Key</option>
+            <option value="scoped_jwt">Scoped JWT</option>
+          </select>
+        </div>
+        <div>
+          <label>JWT (Bearer)</label>
+          <input id="set-jwt" placeholder="eyJhbGciOi..." />
+        </div>
+      </div>
+      <div class="row">
+        <button id="btn-save-apikey" class="primary">Save</button>
+        <button id="btn-clear-apikey" class="ghost">Clear</button>
+        <button id="btn-save-auth" class="ghost">Save Auth Mode/JWT</button>
+      </div>
+      <p class="muted">Stored locally in your browser (localStorage). Reload to apply everywhere.</p>
+    </div>
+  </section>
+</div>
+
+<!-- Right drawer (incident details) -->
+<aside id="drawer" class="drawer" aria-hidden="true">
+  <header>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+      <div>
+        <div id="dr-id" style="font-weight:700;">Incident</div>
+        <div id="dr-meta" class="muted" style="font-size:13px;margin-top:2px;">—</div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <div class="menu-anchor">
+          <button id="dr-copy-curl" class="ghost">Copy cURL ▾</button>
+          <div id="curl-menu" class="menu">
+            <h4>Copy cURL</h4>
+            <div class="row">
+              <select id="curl-kind">
+                <option value="approve">Approve</option>
+                <option value="run">Run pipeline</option>
+                <option value="exec-dry">Execute (dry-run)</option>
+                <option value="exec-live">Execute (live)</option>
+                <option value="jira">Open JIRA</option>
+                <option value="report-md">Get report (md)</option>
+              </select>
+            </div>
+            <div class="row"><textarea id="curl-text" readonly>(select an action)</textarea></div>
+            <div class="btns">
+              <button id="curl-refresh">Refresh</button>
+              <button id="curl-copy" class="primary">Copy</button>
+            </div>
+          </div>
+        </div>
+        <button id="dr-copy-link" class="ghost">Link</button>
+        <button id="dr-close">Close</button>
+      </div>
+    </div>
+  </header>
+  <div class="content">
+    <div id="dr-alert" class="muted" style="margin-bottom:8px;"></div>
+    <div class="row" style="margin-bottom:12px;">
+      <button id="dr-approve" class="primary">Approve</button>
+      <button id="dr-run">Run Pipeline</button>
+      <button id="dr-exec-dry">Execute (dry-run)</button>
+      <button id="dr-exec-live">Execute (live)</button>
+      <button id="dr-pdf">PDF</button>
+      <button id="dr-report">Report</button>
+      <button id="dr-jira">Open JIRA</button>
+    </div>
+    <div class="divider"></div>
+
+    <h3 style="margin:0 0 8px">Candidates</h3>
+    <div id="dr-cands" class="muted">(none)</div>
+
+    <h3 style="margin:12px 0 8px">Executions</h3>
+    <div id="dr-execs" class="muted">(none)</div>
+
+    <h3 style="margin:12px 0 8px">Live Console</h3>
+    <div class="row" style="margin-bottom:6px;">
+      <button id="dr-live-start">Start</button>
+      <button id="dr-live-stop">Stop</button>
+      <span class="muted">SSE: <code>/audit/stream</code> (filtered)</span>
+    </div>
+    <pre id="dr-live" style="min-height:160px;">(disconnected)</pre>
+  </div>
+</aside>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+(function(){
+  const API = location.origin.replace(/\/$/, '');
+  let API_KEY = localStorage.getItem("apiKey") || "changeme-local";
+
+  // ---- NEW: auth mode + jwt state ----
+  let AUTH_MODE = localStorage.getItem("authMode") || "api_key";
+  let JWT_TOKEN = localStorage.getItem("jwt") || "";
+
+  // reflect settings on load (if Settings tab opened later it still shows current values)
+  const $ = (id) => document.getElementById(id);
+  window.addEventListener('DOMContentLoaded', () => {
+    $('set-apikey') && ($('set-apikey').value = API_KEY || '');
+    $('set-authmode') && ($('set-authmode').value = AUTH_MODE);
+    $('set-jwt') && ($('set-jwt').value = JWT_TOKEN);
+  });
+
+  let currentDrawerId = null;
+  let _lastG = 0;
+
+  // ---- helpers ----
+  const isTypingTarget = (el)=> el && ['INPUT','TEXTAREA','SELECT'].includes(el.tagName);
+  const copyToClipboard = async (text) => {
+    try{ await navigator.clipboard.writeText(text); toast('ok','Copied'); }
+    catch(e){ showError('Copy failed: ' + e.message); }
+  };
+  const showError = (msg) => {
+    const b = $('banner'); b.textContent = msg; b.style.display = 'block';
+    console.error('[UI]', msg);
+    toast('error', msg);
+  };
+  function toast(type, text){
+    const box = $('toasts');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = (type==='error'?'❌ ':'✅ ') + text;
+    box.appendChild(el);
+    setTimeout(()=>{ el.remove(); }, 4000);
+  }
+
+  function authHeaders(extra={}){
+    const headers = Object.assign({"X-API-Key": API_KEY}, extra||{});
+    if (AUTH_MODE === 'scoped_jwt' && JWT_TOKEN) headers['Authorization'] = 'Bearer ' + JWT_TOKEN;
+    return headers;
+  }
+
+  // relative time + severity pill
+  function timeAgo(iso){
+    if (!iso) return '-';
+    const t = new Date(iso).getTime(); if (!isFinite(t)) return iso;
+    const s = Math.floor((Date.now() - t)/1000);
+    if (s < 60) return s + 's ago';
+    const m = Math.floor(s/60); if (m < 60) return m + 'm ago';
+    const h = Math.floor(m/60); if (h < 24) return h + 'h ago';
+    const d = Math.floor(h/24); return d + 'd ago';
+  }
+  function sevPill(sev){
+    const s = (sev||'').toUpperCase();
+    const cls = s==='HIGH'?'sev-high':(s==='MEDIUM'?'sev-medium':'sev-low');
+    return `<span class="sev-pill ${cls}">${s||'-'}</span>`;
+  }
+
+  async function fetchJSON(path, opts={}){
+    opts.headers = authHeaders(opts.headers||{});
+    const res = await fetch(API + path, opts);
+    if (!res.ok) {
+      const t = await res.text().catch(()=>res.statusText);
+      throw new Error(`HTTP ${res.status}: ${t}`);
+    }
+    return res.json();
+  }
+  async function fetchText(path){
+    const res = await fetch(API + path, {headers: authHeaders()});
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+    return res.text();
+  }
+
+  function mdToHtml(md){
+    let html = md
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+      .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+      .replace(/`([^`]+)`/gim, '<code>$1</code>')
+      .replace(/^\s*-\s+(.*)$/gim, '<ul><li>$1</li></ul>')
+      .replace(/\n/gim, '<br/>');
+    return html.replace(/<\/ul><ul>/g, '');
+  }
+
+  function setActive(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===tab));
+    document.querySelectorAll('.tabpane').forEach(p => p.classList.add('hidden'));
+    const el = document.getElementById(tab);
+    if (el) el.classList.remove('hidden');
+    try{ localStorage.setItem('lastTab', tab); }catch(_){}
+  }
+
+  const safeBind = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+
+  // ---- status/health/metrics ----
+  async function loadStatus(){
+    try {
+      const s = await fetchJSON("/status");
+      $("status").textContent = JSON.stringify(s, null, 2);
+      $("uptime").textContent = "uptime: " + s.uptime_seconds + "s";
+      $("kb").textContent = "kb: " + s.kb_docs + " docs";
+      $("counts").textContent = `incidents: ${s.incidents_count} | results: ${s.results_count}`;
+      const vecdir = (s.env && s.env.vector_dir) ? s.env.vector_dir : "(unknown)";
+      $("kb-vecdir").textContent = "dir: " + vecdir;
+    } catch(e) { showError("Failed /status: " + e.message); }
+  }
+  async function loadHealth(){
+    try { $("health-pre").textContent = JSON.stringify(await fetchJSON("/health"), null, 2); }
+    catch(e){ $("health-pre").textContent = "Failed: " + e.message; }
+  }
+  async function loadMetrics(){
+    try {
+      const res = await fetch(API + "/metrics", { headers: authHeaders() });
+      $("metrics-pre").textContent = await res.text();
+    } catch(e){ $("metrics-pre").textContent = "Failed: " + e.message; }
+  }
+
+  // ---- incidents (server-side search + paging) ----
+  let _offset = 0, _limit = 10, _total = 0, _autoTimer = null;
+  function currentQuery(){
+    return {
+      q: ($("search")?.value || "").trim(),
+      severity: ($("severity")?.value || "").trim(),
+      sort: ($("sort")?.value || "-created_at"),
+      limit: _limit,
+      offset: _offset,
+    };
+  }
+  function qToString(q){
+    const p = new URLSearchParams();
+    if (q.q) p.set("q", q.q);
+    if (q.severity) p.set("severity", q.severity);
+    if (q.sort) p.set("sort", q.sort);
+    p.set("limit", String(q.limit));
+    p.set("offset", String(q.offset));
+    return p.toString();
+  }
+  async function listIncidents(){
+    const tbody = document.querySelector("#incidents-table tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "<tr><td colspan='5' class='muted'>loading…</td></tr>";
+    try{
+      const res = await fetchJSON("/incidents/search?" + qToString(currentQuery()));
+      _total = res.total; const incs = res.items || [];
+      renderIncidents(incs);
+      if ($("prev")) $("prev").disabled = (_offset <= 0);
+      if ($("next")) $("next").disabled = (_offset + _limit >= _total);
+    }catch(e){
+      tbody.innerHTML = `<tr><td colspan="5" class="err">Failed: ${e.message}</td></tr>`;
+      if (String(e.message).includes("401")) {
+        $('banner').innerHTML = 'Unauthorized: set API Key in Settings <i>or</i> switch to <code>Scoped JWT</code> and paste a valid token.';
+        $('banner').style.display = 'block';
+      }
+    }
+  }
+  function renderIncidents(incs){
+    const tbody = document.querySelector("#incidents-table tbody");
+    if (!tbody) return;
+    tbody.innerHTML = incs.map(i => `
+      <tr>
+        <td>${i.id}</td>
+        <td>${i.service}</td>
+        <td>${sevPill(i.severity)}</td>
+        <td title="${i.created_at || ''}">${timeAgo(i.created_at)}</td>
+        <td class="right">
+          <button data-act="details" data-id="${i.id}">Details</button>
+          <button data-act="approve" data-id="${i.id}">Approve</button>
+          <button data-act="run" data-id="${i.id}">Run</button>
+          <button data-act="report" data-id="${i.id}">Report</button>
+          <button data-act="pdf" data-id="${i.id}">PDF</button>
+          <button data-act="jira" data-id="${i.id}">JIRA</button>
+        </td>
+      </tr>
+    `).join("");
+
+    tbody.querySelectorAll("button[data-act]").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const id = btn.getAttribute("data-id");
+        const act = btn.getAttribute("data-act");
+        try {
+          if (act === "details") { await openDrawer(id); }
+          if (act === "approve") { await approve(id); }
+          if (act === "run")     { await run(id); }
+          if (act === "report")  { await loadReport(id); setActive("report"); }
+          if (act === "pdf")     { window.open(`/incidents/${id}/report.pdf`, "_blank"); }
+          if (act === "jira")    { await jiraPrompt(id); }
+        } catch(e) { showError(`${act} failed: ${e.message}`); }
+      });
+    });
+  }
+
+  // ---- actions ----
+  async function detectDemo(){ return createIncident("checkout", "recent deploy", 1.6, 1200, 60); }
+  async function createIncident(service, cause, five, p95, win){
+    const payload = {
+      service: service || "checkout",
+      suspected_cause: cause || "recent deploy",
+      signals: [
+        {name:"5xx_rate", value: Number(five)||0, unit:"%", window_s:Number(win)||60},
+        {name:"latency_p95_ms", value: Number(p95)||0, unit:"ms", window_s:Number(win)||60},
+      ]
+    };
+    const inc = await fetchJSON("/incidents/detect", {
+      method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)
+    });
+    await listIncidents(); await loadStatus();
+    toast('ok', `Created incident ${inc.id}`);
+    return inc.id;
+  }
+  async function approve(id){
+    await fetchJSON(`/incidents/${id}/approve`, {method:"POST"});
+    toast('ok', `Approved ${id}`);
+    await loadStatus();
+  }
+  async function run(id){
+    await fetchJSON(`/incidents/${id}/run`, {method:"POST"});
+    toast('ok', `Pipeline started for ${id}`);
+    await loadReport(id);
+    await loadStatus();
+  }
+  async function loadReport(id){
+    let incId = id;
+    if (!incId) {
+      const res = await fetchJSON("/incidents/search?limit=1&offset=0&sort=-created_at");
+      if (!res.items || !res.items.length) { $("report-pre").textContent = "(no incidents yet)"; $("report-html").innerHTML=""; return; }
+      incId = res.items[0].id;
+    }
+    const txt = await fetchText(`/incidents/${incId}/report.md`);
+    $("report-pre").textContent = txt;
+    $("report-html").innerHTML = mdToHtml(txt);
+  }
+  async function downloadLatestMD(){
+    const res = await fetchJSON("/incidents/search?limit=1&offset=0&sort=-created_at");
+    if (!res.items?.length) { alert("No incidents"); return; }
+    const id = res.items[0].id;
+    const md = await fetchText(`/incidents/${id}/report.md`);
+    const blob = new Blob([md], {type:"text/markdown;charset=utf-8"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `incident_${id}.md`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function jiraPrompt(id){
+    const summary = prompt("JIRA summary:", `[Incident ${id}]`);
+    if (summary === null) return;
+    const description = prompt("JIRA description:", `Auto-created from Incident Copilot for ${id}.`);
+    try{
+      const r = await fetchJSON(`/incidents/${id}/jira`, {
+        method:"POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({summary, description})
+      });
+      toast('ok', `JIRA created: ${JSON.stringify(r.jira && r.jira.key ? r.jira.key : r.jira || r)}`);
+    }catch(e){
+      showError("JIRA failed: " + e.message);
+    }
+  }
+
+  // ---- Drawer (details + candidates + execs + live + copy cURL) ----
+  const drawer = $('drawer');
+  function clearHash(){ history.replaceState(null, '', location.pathname + location.search); }
+  function closeDrawer(){ drawer.classList.remove('open'); stopLiveConsole(); currentDrawerId=null; clearHash(); hideCurlMenu(); }
+  function openDrawerUI(){ drawer.classList.add('open'); }
+  $('dr-close').addEventListener('click', closeDrawer);
+
+  function buildCurl(kind, id){
+    const base = API + `/incidents/${id}`;
+    const keyH = `-H 'X-API-Key: ${API_KEY}'`;
+    const jwtH = (AUTH_MODE==='scoped_jwt' && JWT_TOKEN) ? ` -H 'Authorization: Bearer ${JWT_TOKEN}'` : '';
+    const jsonH = `-H 'Content-Type: application/json'`;
+    if (kind === 'approve')   return `curl -X POST ${keyH}${jwtH} '${base}/approve'`;
+    if (kind === 'run')       return `curl -X POST ${keyH}${jwtH} '${base}/run'`;
+    if (kind === 'exec-dry')  return `curl -X POST ${keyH}${jwtH} '${base}/execute?dry_run=true'`;
+    if (kind === 'exec-live') return `curl -X POST ${keyH}${jwtH} '${base}/execute?dry_run=false'`;
+    if (kind === 'jira')      return `curl -X POST ${keyH}${jwtH} ${jsonH} -d '{"summary":"[Incident ${id}]","description":"Auto-created from UI"}' '${base}/jira'`;
+    if (kind === 'report-md') return `curl ${keyH}${jwtH} '${base}/report.md'`;
+    return '';
+  }
+
+  function showCurlMenu(id){
+    const menu = $('curl-menu'); if (!menu) return;
+    menu.classList.add('open');
+    const upd = ()=>{
+      const kind = $('curl-kind').value;
+      $('curl-text').value = buildCurl(kind, id);
+    };
+    $('curl-kind').onchange = upd;
+    $('curl-refresh').onclick = upd;
+    $('curl-copy').onclick = ()=> copyToClipboard($('curl-text').value);
+    upd();
+    const onOutside = (e)=>{ if (!menu.contains(e.target) && e.target.id!=='dr-copy-curl'){ hideCurlMenu(); document.removeEventListener('click', onOutside); } };
+    document.addEventListener('click', onOutside);
+  }
+  function hideCurlMenu(){ const m = $('curl-menu'); if (m) m.classList.remove('open'); }
+
+  async function openDrawer(id){
+    try{
+      const st = await fetchJSON(`/incidents/${id}/status`);
+      currentDrawerId = id;
+      location.hash = '#incident=' + encodeURIComponent(id);
+
+      $('dr-id').textContent = `Incident ${st.incident_id}`;
+      $('dr-meta').textContent = `service=${st.service} • severity=${st.severity} • approved=${st.approved} • has_result=${st.has_result}`;
+      $('dr-alert').textContent = '';
+
+      $('dr-copy-link').onclick = ()=> {
+        const url = location.origin + '/#incident=' + encodeURIComponent(id);
+        copyToClipboard(url);
+      };
+      $('dr-copy-curl').onclick = (e)=>{ e.stopPropagation(); const m = $('curl-menu'); if (m.classList.contains('open')) hideCurlMenu(); else showCurlMenu(id); };
+
+      $('dr-approve').onclick = async ()=>{ await approve(id); const s = await fetchJSON(`/incidents/${id}/status`); $('dr-meta').textContent = `service=${s.service} • severity=${s.severity} • approved=${s.approved} • has_result=${s.has_result}`; };
+      $('dr-run').onclick     = async ()=>{ await run(id); await refreshCands(id); };
+      $('dr-pdf').onclick     = ()=> window.open(`/incidents/${id}/report.pdf`, "_blank");
+      $('dr-report').onclick  = async ()=>{ await loadReport(id); setActive("report"); };
+      $('dr-jira').onclick    = async ()=>{ await jiraPrompt(id); };
+
+      $('dr-exec-dry').onclick = async ()=> {
+        try {
+          const r = await fetchJSON(`/incidents/${id}/execute?dry_run=true`, { method: 'POST' });
+          toast('ok', `Dry-run: ${r.status}`);
+          await refreshCands(id);
+          await refreshExecs(id);
+        } catch(e) { showError('Execute failed: ' + e.message); }
+      };
+      $('dr-exec-live').onclick = async ()=> {
+        try {
+          const r = await fetchJSON(`/incidents/${id}/execute?dry_run=false`, { method: 'POST' });
+          toast('ok', `Execute: ${r.status}`);
+          await refreshCands(id);
+          await refreshExecs(id);
+        } catch(e) { showError('Execute failed: ' + e.message); }
+      };
+
+      // live console buttons
+      $('dr-live-start').onclick = ()=> startLiveConsole(id);
+      $('dr-live-stop').onclick  = ()=> stopLiveConsole();
+
+      await refreshCands(id);
+      await refreshExecs(id);
+      startLiveConsole(id);
+      openDrawerUI();
+    }catch(e){
+      showError("Details failed: " + e.message);
+    }
+  }
+
+  async function refreshCands(id){
+    const box = $('dr-cands'); if (!box) return;
+    box.innerHTML = '(loading…)';
+    try{
+      const cands = await fetchJSON(`/incidents/${id}/candidates`);
+      let chosenId = null;
+      const maybeChosen = cands.find(c => c.chosen || c.is_chosen);
+      if (maybeChosen) chosenId = maybeChosen.id;
+
+      if (!cands.length) { box.innerHTML = '<span class="muted">(No candidates yet. Click "Run Pipeline".)</span>'; return; }
+      box.innerHTML = cands.map(c => {
+        const vio = Array.isArray(c.policy_violations) && c.policy_violations.length ? `<div class="err">violations: ${c.policy_violations.map(v=>v.code||v).join('; ')}</div>` : `<div class="ok">policy: ok</div>`;
+        const steps = (c.steps||[]).map(s=>`<li>[${s.action_type}] ${s.description || s.action || ''}</li>`).join('');
+        const impact = c.predicted_impact ? `<div class="pill-sm">impact: ${JSON.stringify(c.predicted_impact)}</div>` : '';
+        const isChosen = chosenId ? (c.id===chosenId) : false;
+        return `
+          <div class="cand ${isChosen?'chosen':''}">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-weight:700">${c.title || c.name || c.id}</div>
+              <span class="pill-sm">${c.env || 'env'}</span>
+            </div>
+            ${isChosen?'<div class="pill-sm" style="margin-top:6px;">Chosen</div>':''}
+            <div class="muted" style="margin:6px 0">${c.rationale || ''}</div>
+            ${impact}
+            <div style="margin:8px 0;"><ul style="margin:0 0 0 18px;">${steps}</ul></div>
+            ${vio}
+            <div style="margin-top:8px; display:flex; gap:8px;">
+              <button data-choose="${c.id}">Choose</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      box.querySelectorAll('button[data-choose]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const pid = btn.getAttribute('data-choose');
+          try{
+            await fetchJSON(`/incidents/${id}/choose?plan_id=${encodeURIComponent(pid)}`, {method:'POST'});
+            toast('ok', `Chosen plan ${pid}`);
+            await refreshCands(id);
+          }catch(e){ showError('Choose failed: ' + e.message); }
+        });
+      });
+    }catch(e){
+      box.innerHTML = `<span class="err">Failed: ${e.message}</span>`;
+    }
+  }
+
+  async function refreshExecs(id){
+    const box = $('dr-execs'); if (!box) return;
+    box.innerHTML = '(loading…)';
+    try{
+      const execs = await fetchJSON(`/incidents/${id}/executions`);
+      if (!execs.length) { box.innerHTML = '<span class="muted">(No executions yet)</span>'; return; }
+      box.innerHTML = execs.map((e, idx) => `
+        <div style="border:1px solid var(--border);border-radius:10px;padding:8px;margin:6px 0;background:#0f172a;">
+          <div><b>${String(e.status || 'unknown').toUpperCase()}</b> — dry_run=${e.dry_run}</div>
+          <div class="muted" style="font-size:12px;" title="${(e.started_at||'-')} → ${(e.ended_at||'-')}">
+            ${timeAgo(e.started_at)} → ${timeAgo(e.ended_at)}
+          </div>
+          <div style="margin-top:4px;">steps: ${(e.steps||[]).length} <button data-view-steps="${idx}" style="margin-left:8px;">View</button></div>
+        </div>
+      `).join('');
+
+      box.querySelectorAll('button[data-view-steps]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const i = Number(btn.getAttribute('data-view-steps')||0);
+          const ex = execs[i] || {};
+          openExecModal(ex);
+        });
+      });
+    }catch(err){
+      box.innerHTML = `<span class="err">Failed: ${err.message}</span>`;
+    }
+  }
+
+  // ---- Live Console (drawer) — SSE with auth
+  let liveCtl = null;
+  function startLiveConsole(incidentId){
+    stopLiveConsole();
+    $('dr-live').textContent = '(connecting…)';
+
+    fetch(API + '/audit/stream', { headers: authHeaders() })
+      .then(res => {
+        if (!res.ok || !res.body) throw new Error('HTTP ' + res.status);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        liveCtl = { close(){ try{ reader.cancel(); }catch(_){} liveCtl=null; } };
+        const read = () => reader.read().then(({value, done}) => {
+          if (done) { $('dr-live').textContent += '\n(disconnected)'; liveCtl=null; return; }
+          const chunk = decoder.decode(value, {stream:true});
+          chunk.split('\n').forEach(line=>{
+            if (line.startsWith('data: ')) {
+              const payload = line.slice(6);
+              if (!incidentId || payload.includes(incidentId)) {
+                $('dr-live').textContent += '\n' + payload;
+                const pre = $('dr-live'); pre.scrollTop = pre.scrollHeight;
+              }
+            }
+          });
+          return read();
+        }).catch(err=>{
+          $('dr-live').textContent += '\n[error] ' + err;
+          liveCtl=null;
+        });
+        return read();
+      })
+      .catch(err=>{
+        $('dr-live').textContent += '\n[error] ' + err;
+        liveCtl=null;
+      });
+  }
+  function stopLiveConsole(){
+    if (liveCtl){ liveCtl.close(); $('dr-live').textContent += '\n(disconnected)'; }
+  }
+
+  // ---- Exec steps modal
+  function openExecModal(exec){
+    const modal = $('exec-modal');
+    const body = $('exec-modal-body');
+    const title = $('exec-modal-title');
+    title.textContent = `Execution — ${String(exec.status||'UNKNOWN').toUpperCase()} (dry_run=${!!exec.dry_run})`;
+    const steps = exec.steps || [];
+    if (!steps.length){
+      body.innerHTML = '<div class="muted">(no steps)</div>';
+    } else {
+      body.innerHTML = steps.map(s => `
+        <div style="border:1px solid var(--border);border-radius:10px;padding:8px;margin:8px 0;">
+          <div><b>[${s.step_index}] ${s.action_type}</b></div>
+          <div class="${s.ok?'ok':'err'}">${s.ok ? 'ok' : 'error'}</div>
+          <div class="muted" style="font-size:12px;">${s.started_at || '-'} → ${s.ended_at || '-'}</div>
+          <div style="margin-top:4px; white-space:pre-wrap;">${s.message || ''}</div>
+        </div>
+      `).join('');
+    }
+    modal.classList.remove('hidden');
+  }
+  (function bindExecModal(){
+    const modal = $('exec-modal');
+    const close = $('exec-modal-close');
+    if (close) close.addEventListener('click', ()=> modal.classList.add('hidden'));
+    const backdrop = modal?.querySelector('.modal-backdrop');
+    if (backdrop) addEventListener('click', ()=> modal.classList.add('hidden'));
+  })();
+
+  // ---- Monitoring: simple canvas charts (no deps) ----
+  const samples = { t: [], incidents: [], runs: [], approvals: [], execs: [], kb: [] };
+
+  function parseProm(text){
+    // tiny parser for "name{...} value"
+    const out = {};
+    text.split('\n').forEach(line=>{
+      if(!line || line[0]==='#') return;
+      const m = line.match(/^([a-zA-Z_:][\w:]*)(\{[^}]*\})?\s+(-?\d+(?:\.\d+)?(?:e[+-]?\d+)?)$/);
+      if (m) out[m[1]] = Number(m[3]);
+    });
+    return out;
+  }
+
+  function drawLineChart(canvas, arr, color='#60a5fa'){
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = '#0b1220';
+    ctx.fillRect(0,0,w,h);
+    ctx.strokeStyle = 'rgba(148,163,184,.25)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<5;i++){
+      const y = Math.round((i/4)* (h-20)) + 10;
+      ctx.beginPath(); ctx.moveTo(30,y); ctx.lineTo(w-6,y); ctx.stroke();
+    }
+    if (!arr.length) return;
+    const min = Math.min(...arr), max = Math.max(...arr);
+    const pad = (max-min)===0 ? 1 : (max-min)*.1;
+    const lo = min - pad, hi = max + pad;
+    const nx = arr.length;
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '10px ui-monospace, monospace';
+    ctx.fillText(String(hi.toFixed(2)), 4, 12);
+    ctx.fillText(String(lo.toFixed(2)), 4, h-6);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for(let i=0;i<nx;i++){
+      const x = 30 + (i/(nx-1))*(w-40);
+      const y = 10 + (1 - (arr[i]-lo)/(hi-lo))*(h-20);
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  const drawSparkline = (canvas, arr)=> drawLineChart(canvas, arr, '#22c55e');
+
+  function drawDonut(canvas, values){
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+    const cx=w/2, cy=h/2, r=Math.min(w,h)/2 - 10, inner=r*0.6;
+    const total = values.reduce((a,b)=>a+b,0) || 1;
+    const cols = ['#ef4444', '#f59e0b', '#22c55e']; // HIGH, MEDIUM, LOW
+    let start = -Math.PI/2;
+    values.forEach((v,i)=>{
+      const ang = (v/total)*Math.PI*2;
+      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+ang); ctx.closePath();
+      ctx.fillStyle = cols[i]; ctx.fill(); start += ang;
+    });
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(cx,cy,inner,0,Math.PI*2); ctx.fill();
+    ctx.globalCompositeOperation = 'source-over';
+    const labels = ['HIGH','MEDIUM','LOW'];
+    labels.forEach((lab,i)=>{
+      ctx.fillStyle = cols[i]; ctx.fillRect(8, 10+ i*18, 12, 12);
+      ctx.fillStyle = '#94a3b8'; ctx.font = '12px system-ui, sans-serif';
+      ctx.fillText(`${lab} (${values[i]||0})`, 26, 20 + i*18);
+    });
+  }
+
+  async function refreshSeverityDonut(){
+    try{
+      const res = await fetchJSON("/incidents/search?limit=200&offset=0&sort=-created_at");
+      const items = res.items || [];
+      const high = items.filter(i=>String(i.severity).toUpperCase()==='HIGH').length;
+      const med  = items.filter(i=>String(i.severity).toUpperCase()==='MEDIUM').length;
+      const low  = items.filter(i=>String(i.severity).toUpperCase()==='LOW').length;
+      drawDonut($('chart-severity'), [high, med, low]);
+    }catch(e){ /* ignore */ }
+  }
+
+  async function tickMetrics(){
+    try{
+      const res = await fetch(API + "/metrics", { headers: authHeaders() });
+      const text = await res.text();
+      const m = parseProm(text);
+      samples.t.push(Date.now());
+      samples.incidents.push(Number(m.incidents_total || 0));
+      samples.runs.push(Number(m.pipeline_runs_total || 0));
+      samples.approvals.push(Number(m.approvals_total || 0));
+      samples.execs.push(Number(m.executions_total || 0));
+      samples.kb.push(Number(m.kb_docs || 0));
+      const trim = (a)=>{ if (a.length>200) a.splice(0, a.length-200); };
+      Object.values(samples).forEach(v=>Array.isArray(v)&&trim(v));
+
+      drawLineChart($('chart-incidents'), samples.incidents);
+      drawSparkline($('spark-pipeline'), samples.runs);
+      drawSparkline($('spark-approvals'), samples.approvals);
+      drawSparkline($('spark-execs'), samples.execs);
+      drawSparkline($('spark-kb'), samples.kb);
+
+      const last = (a)=> a.length ? a[a.length-1] : 0;
+      $('spark-pipeline-now').textContent = String(last(samples.runs));
+      $('spark-approvals-now').textContent = String(last(samples.approvals));
+      $('spark-execs-now').textContent = String(last(samples.execs));
+      $('spark-kb-now').textContent = String(last(samples.kb));
+    }catch(e){ /* transient */ }
+  }
+
+  // ---- Audit streaming tab (SSE) ----
+  let auditStreamCtl = null;
+  function auditConnect(){
+    if (auditStreamCtl) return;
+    $('audit-pre').textContent = '(connecting…)';
+
+    fetch(API + '/audit/stream', { headers: authHeaders() })
+      .then(res => {
+        if (!res.ok || !res.body) throw new Error('HTTP ' + res.status);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        auditStreamCtl = { close(){ try{ reader.cancel(); }catch(_){} auditStreamCtl=null; } };
+        const read = () => reader.read().then(({value, done}) => {
+          if (done) { $('audit-pre').textContent += '\n(disconnected)'; auditStreamCtl=null; return; }
+          const chunk = decoder.decode(value, {stream:true});
+          chunk.split('\n').forEach(line=>{
+            if (line.startsWith('data: ')) {
+              $('audit-pre').textContent += '\n' + line.slice(6);
+              const pre = $('audit-pre'); pre.scrollTop = pre.scrollHeight;
+            }
+          });
+          return read();
+        }).catch(err=>{
+          $('audit-pre').textContent += '\n[error] ' + err; auditStreamCtl=null;
+        });
+        return read();
+      })
+      .catch(err=>{
+        $('audit-pre').textContent += '\n[error] ' + err; auditStreamCtl=null;
+      });
+  }
+  function auditDisconnect(){ if (auditStreamCtl){ auditStreamCtl.close(); $('audit-pre').textContent += '\n(disconnected)'; } }
+
+  // ---- bindings ----
+  (function bindTabs(){
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        setActive(t.dataset.tab);
+        if (t.dataset.tab === 'incidents') {
+          if (_autoTimer) clearInterval(_autoTimer);
+          _autoTimer = setInterval(()=>{ listIncidents(); }, 10000);
+        } else {
+          if (_autoTimer) { clearInterval(_autoTimer); _autoTimer = null; }
+        }
+        if (t.dataset.tab === 'kb'){ loadKBStats(); }
+        if (t.dataset.tab === 'monitor'){ refreshSeverityDonut(); }
+      });
+    });
+  })();
+
+  // keyboard shortcuts
+  document.addEventListener('keydown', (e)=>{
+    if (isTypingTarget(e.target)) return;
+    const k = e.key.toLowerCase();
+    if (k === '?'){ e.preventDefault(); toast('ok','Shortcuts: g o=Overview, g i=Incidents, g m=Monitoring, g r=Report, g k=KB, g a=Audit, g s=Settings, r=Refresh'); return; }
+    if (k === 'r'){ e.preventDefault(); loadStatus(); listIncidents(); return; }
+    if (k === 'g'){ _lastG = Date.now(); return; }
+    if (Date.now() - _lastG < 1200){
+      if (k === 'o') setActive('overview');
+      if (k === 'i') setActive('incidents');
+      if (k === 'm') setActive('monitor');
+      if (k === 'r') setActive('report');
+      if (k === 'k') setActive('kb');
+      if (k === 'a') setActive('audit');
+      if (k === 's') setActive('settings');
+      _lastG = 0;
+    }
+  });
+
+  // settings (API key + auth mode/jwt)
+  const bindIf = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+  bindIf("btn-save-apikey","click", ()=>{
+    const v = $('set-apikey').value.trim();
+    if (!v) return showError('Enter an API key value.');
+    localStorage.setItem('apiKey', v); API_KEY = v; toast('ok','API key saved. Reloading…'); setTimeout(()=>location.reload(), 600);
+  });
+  bindIf("btn-clear-apikey","click", ()=>{
+    localStorage.removeItem('apiKey'); API_KEY="";
+    toast('ok','API key cleared. Reloading…'); setTimeout(()=>location.reload(), 600);
+  });
+  bindIf("btn-save-auth","click", ()=>{
+    AUTH_MODE = $('set-authmode').value;
+    JWT_TOKEN = $('set-jwt').value.trim();
+    localStorage.setItem('authMode', AUTH_MODE);
+    localStorage.setItem('jwt', JWT_TOKEN);
+    toast('ok','Auth settings saved. Reloading…'); setTimeout(()=>location.reload(), 600);
+  });
+
+  // quick actions
+  bindIf("btn-detect","click", async ()=>{ try{ const id = await detectDemo(); alert("Created incident " + id); }catch(e){ showError("Detect failed: " + e.message); }});
+  bindIf("btn-approve","click", async ()=>{ try { const res = await fetchJSON("/incidents/search?limit=1&offset=0&sort=-created_at"); if (!res.items?.length) return alert("No incidents"); await approve(res.items[0].id); } catch(e){ showError("Approve failed: " + e.message); }});
+  bindIf("btn-run","click", async ()=>{ try { const res = await fetchJSON("/incidents/search?limit=1&offset=0&sort=-created_at"); if (!res.items?.length) return alert("No incidents"); await run(res.items[0].id); } catch(e){ showError("Run failed: " + e.message); }});
+  bindIf("btn-refresh","click", ()=>{ loadStatus(); listIncidents(); });
+
+  // create
+  bindIf("btn-create","click", async ()=>{ try {
+    const id = await createIncident($("svc")?.value, $("cause")?.value, $("five")?.value, $("p95")?.value, $("win")?.value);
+    const msg = $("create-msg"); if (msg) msg.textContent = "Created incident " + id;
+    setActive("incidents");
+  } catch(e){ showError("Create failed: " + e.message); }});
+
+  // report
+  bindIf("btn-load-report","click", ()=>loadReport());
+  bindIf("btn-download-md","click", ()=>downloadLatestMD());
+  bindIf("btn-download-pdf","click", async ()=>{ try {
+    const res = await fetchJSON("/incidents/search?limit=1&offset=0&sort=-created_at");
+    if (!res.items?.length) return alert("No incidents");
+    window.open(`/incidents/${res.items[0].id}/report.pdf`, "_blank");
+  } catch(e){ showError("PDF failed: " + e.message); }});
+
+  // paging/search
+  bindIf("search","input", ()=>{ _offset = 0; listIncidents(); });
+  bindIf("severity","change", ()=>{ _offset = 0; listIncidents(); });
+  bindIf("sort","change", ()=>{ _offset = 0; listIncidents(); });
+  bindIf("prev","click", ()=>{ _offset = Math.max(0, _offset - _limit); listIncidents(); });
+  bindIf("next","click", ()=>{ if (_offset + _limit < _total) _offset += _limit; listIncidents(); });
+
+  // KB
+  bindIf("kb-text-submit","click", kbAddText);
+  bindIf("kb-url-submit","click", kbAddUrl);
+
+  async function kbAddText(){
+    const title = $('kb-text-title').value.trim();
+    const text = $('kb-text-body').value.trim();
+    const service = $('kb-text-service').value.trim() || null;
+    const uri = $('kb-text-uri').value.trim() || null;
+    if (!title || !text) return showError('Title and Text are required.');
+    try{
+      await fetchJSON('/kb/ingest/text', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({title, text, service, uri})});
+      toast('ok','Added text doc');
+      $('kb-text-body').value=''; $('kb-text-title').value=''; $('kb-text-service').value=''; $('kb-text-uri').value='';
+      await loadKBStats(); await listKB();
+    }catch(e){ showError('Text ingest failed: ' + e.message); }
+  }
+  async function kbAddUrl(){
+    const url = $('kb-url-url').value.trim();
+    const title = $('kb-url-title').value.trim() || null;
+    const service = $('kb-url-service').value.trim() || null;
+    if (!url) return showError('URL is required.');
+    try{
+      await fetchJSON('/kb/ingest/url', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({url, title, service})});
+      toast('ok','Added URL');
+      $('kb-url-url').value=''; $('kb-url-title').value=''; $('kb-url-service').value='';
+      await loadKBStats(); await listKB();
+    }catch(e){ showError('URL ingest failed: ' + e.message); }
+  }
+
+  async function loadKBStats(){
+    try{
+      const s = await fetchJSON('/kb/stats');
+      $('kb-stats-pre').textContent = JSON.stringify(s, null, 2);
+      $('kb-count').textContent = 'count: ' + (s.count ?? (s.docs || 0));
+      $('kb-vecdir').textContent = 'dir: ' + (s.vector_dir || s.vector_db_dir || '(unknown)');
+    }catch(e){ $('kb-stats-pre').textContent = 'Failed: ' + e.message; }
+  }
+
+  async function listKB(){
+    const tbody = document.querySelector('#kb-table tbody');
+    if (!tbody) return;
+    tbody.innerHTML = "<tr><td colspan='5' class='muted'>loading…</td></tr>";
+    try{
+      const docs = await fetchJSON('/kb/docs?limit=100&offset=0');
+      tbody.innerHTML = (docs.items || docs || []).map(d=>`
+        <tr>
+          <td>${d.id || '(n/a)'}</td>
+          <td>${d.title || ''}</td>
+          <td>${(d.metadata && d.metadata.service) || d.service || ''}</td>
+          <td>${d.uri || d.path || d.filename || ''}</td>
+          <td class="right"><button data-del="${d.id}">Delete</button></td>
+        </tr>
+      `).join('');
+      tbody.querySelectorAll('button[data-del]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const id = btn.getAttribute('data-del');
+          if (!confirm('Delete doc ' + id + '?')) return;
+          try{ await fetchJSON(`/kb/docs/${encodeURIComponent(id)}`, {method:'DELETE'}); toast('ok','Deleted'); await loadKBStats(); await listKB(); }
+          catch(e){ showError('Delete failed: ' + e.message); }
+        });
+      });
+    }catch(e){
+      tbody.innerHTML = `<tr><td colspan="5" class="err">Failed: ${e.message}</td></tr>`;
+    }
+  }
+
+  // deep-link: open drawer if URL hash has incident
+  function handleHash(){
+    const h = (location.hash || '').replace(/^#/, '');
+    if (!h) return;
+    const p = new URLSearchParams(h);
+    const id = p.get('incident');
+    if (id) openDrawer(id);
+  }
+  window.addEventListener('hashchange', handleHash);
+
+  // Monitoring polling loop
+  let monitorTimer = null;
+  function startMonitor(){
+    if (monitorTimer) return;
+    refreshSeverityDonut();
+    tickMetrics();
+    monitorTimer = setInterval(()=>{ tickMetrics(); refreshSeverityDonut(); }, 5000);
+  }
+  function stopMonitor(){ if (monitorTimer) { clearInterval(monitorTimer); monitorTimer=null; } }
+
+  // initial load
+  (async function init(){
+    try {
+      const last = localStorage.getItem('lastTab');
+      if (last) setActive(last);
+
+      await loadStatus();
+      await listIncidents();
+      await loadHealth();
+      await loadMetrics();
+      await loadKBStats();
+
+      handleHash();
+
+      if (!document.getElementById('monitor').classList.contains('hidden')) startMonitor();
+      document.querySelectorAll('.tab').forEach(t=>{
+        t.addEventListener('click', ()=>{
+          if (t.dataset.tab==='monitor') startMonitor(); else stopMonitor();
+        });
+      });
+
+      // Bind audit buttons (after DOM is ready)
+      const bindIf = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+      bindIf('audit-connect', 'click', auditConnect);
+      bindIf('audit-disconnect', 'click', auditDisconnect);
+    } catch(e){
+      showError("Init failed: " + e.message);
+    }
+  })();
+})();
+</script>
+
+<!-- Modal for per-step results -->
+<div id="exec-modal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div id="exec-modal-title" style="font-weight:600;">Execution — </div>
+      <button id="exec-modal-close">Close</button>
+    </div>
+    <div id="exec-modal-body" class="modal-body">
+      <!-- Steps will be injected here -->
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

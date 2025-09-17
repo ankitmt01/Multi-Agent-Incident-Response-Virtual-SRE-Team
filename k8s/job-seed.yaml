@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: incident-copilot-seed
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: seed
+        image: your-registry/agentic-incident-response:latest
+        command: ["python","-m","scripts.seed_kb"]
+        env:
+          - name: VECTOR_DB_DIR
+            value: "/data/chroma"
+        volumeMounts:
+          - name: chroma-pv
+            mountPath: /data/chroma
+      volumes:
+        - name: chroma-pv
+          persistentVolumeClaim:
+            claimName: chroma-pvc

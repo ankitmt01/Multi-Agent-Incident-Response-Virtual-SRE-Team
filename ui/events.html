@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf-8"/>
+<title>Incident Copilot — Live Audit</title>
+<style>
+  body { font: 14px system-ui, sans-serif; margin: 1rem; }
+  pre { background:#111; color:#ddd; padding:1rem; border-radius:8px; max-height:70vh; overflow:auto; }
+  .ok { color:#5f5; } .warn { color:#fd5; } .err { color:#f66; }
+</style>
+<h1>Live Audit Stream</h1>
+<pre id="log"></pre>
+<script>
+  const el = document.getElementById('log');
+  const apiKey = localStorage.getItem('API_KEY') || ''; // put your key here or set via devtools
+  const src = new EventSource('/audit/stream' + (apiKey ? `?x=${Date.now()}` : '')); // query added to dodge caches
+ 
+  src.onmessage = (e) => {
+    const line = e.data;
+    el.textContent += line + "\n";
+    el.scrollTop = el.scrollHeight;
+  };
+  src.onerror = () => { el.textContent += "[stream closed]\n"; };
+</script>

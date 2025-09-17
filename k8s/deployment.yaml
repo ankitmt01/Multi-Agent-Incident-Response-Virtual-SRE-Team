@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incident-copilot
+  labels: { app: incident-copilot }
+spec:
+  replicas: 2
+  selector:
+    matchLabels: { app: incident-copilot }
+  template:
+    metadata:
+      labels: { app: incident-copilot }
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: backend
+          image: your-registry/agentic-incident-response:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PORT
+              value: "8000"
+            - name: VECTOR_DB_DIR
+              value: "/data/chroma"
+            - name: KB_MIN_DOCS
+              value: "8"
+            - name: ALLOWED_ORIGINS
+              value: "*"
+          volumeMounts:
+            - name: chroma-pv
+              mountPath: /data/chroma
+          readinessProbe:
+            httpGet: { path: /health, port: 8000 }
+            periodSeconds: 10
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: /health, port: 8000 }
+            periodSeconds: 20
+            initialDelaySeconds: 20
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits: { cpu: "500m", memory: "512Mi" }
+      volumes:
+        - name: chroma-pv
+          persistentVolumeClaim: { claimName: chroma-pvc }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incident-copilot
+spec:
+  selector: { app: incident-copilot }
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  type: ClusterIP

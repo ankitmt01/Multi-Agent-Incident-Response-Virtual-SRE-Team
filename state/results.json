@@ -1,0 +1,2459 @@
+{
+  "a381ac1e-16cb-4114-bfb8-d1dfad339e4f": {
+    "incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-a381ac1e",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-a381ac1e",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-a381ac1e",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-a381ac1e",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-a381ac1e",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-a381ac1e",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "cb445018-ea39-4944-9a0a-174df643a454": {
+    "incident_id": "cb445018-ea39-4944-9a0a-174df643a454",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-cb445018",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-cb445018",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-cb445018",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-cb445018",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-cb445018",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-cb445018",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9": {
+    "incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-cbd6bb37",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-cbd6bb37",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-cbd6bb37",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-cbd6bb37",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-cbd6bb37",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-cbd6bb37",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "459d1deb-47b9-4ad6-bafe-76b2e4941e83": {
+    "incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-459d1deb",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-459d1deb",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-459d1deb",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-459d1deb",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-459d1deb",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-459d1deb",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404": {
+    "incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-6e8f77fe",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-6e8f77fe",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-6e8f77fe",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-6e8f77fe",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-6e8f77fe",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-6e8f77fe",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "5d77a3c6-32e9-48d2-ab6c-dee55426db33": {
+    "incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-5d77a3c6",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-5d77a3c6",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-5d77a3c6",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-5d77a3c6",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-5d77a3c6",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-5d77a3c6",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "132f57ae-db6c-41cd-bb3c-f1e17abdd20b": {
+    "incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-132f57ae",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-132f57ae",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-132f57ae",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-132f57ae",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-132f57ae",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-132f57ae",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "af0ffbef-d0fa-42cd-a445-95c80694c0c9": {
+    "incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-af0ffbef",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-af0ffbef",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-af0ffbef",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-af0ffbef",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-af0ffbef",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-af0ffbef",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  },
+  "93129553-5f3f-432f-972f-d728464b56e9": {
+    "incident_id": "93129553-5f3f-432f-972f-d728464b56e9",
+    "evidence": [],
+    "candidates": [
+      {
+        "id": "rollback-93129553",
+        "title": "Rollback recent deploy for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Recent deploy suspected; rollback to last known good.",
+        "predicted_impact": {
+          "error_rate_pct": -0.5,
+          "latency_p95_ms": -200
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "fetch deploy status"
+          },
+          {
+            "action_type": "deploy",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "version": "previous"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          },
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "verify health"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'deploy' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'deploy' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ],
+          []
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "db-pool-93129553",
+        "title": "Tune DB pool for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "High p95 + low 5xx suggests saturation; raise pool, add backoff.",
+        "predicted_impact": {
+          "error_rate_pct": -0.2,
+          "latency_p95_ms": -150
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "check DB pool graphs"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "db.pool.max",
+            "value": "+20%"
+          },
+          {
+            "action_type": "restart",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ]
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          },
+          {
+            "code": "approval_required",
+            "message": "write action 'restart' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'restart' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "id": "cache-warm-93129553",
+        "title": "Warm cache for checkout",
+        "env": "staging",
+        "service": "checkout",
+        "rationale": "Cache miss storm after deploy; warm critical keys.",
+        "predicted_impact": {
+          "error_rate_pct": -0.1,
+          "latency_p95_ms": -100
+        },
+        "steps": [
+          {
+            "action_type": "read",
+            "env": "staging",
+            "service": "checkout",
+            "cmd": "inspect cache hit-rate"
+          },
+          {
+            "action_type": "config_change",
+            "env": "staging",
+            "service": "checkout",
+            "targets": [
+              "checkout"
+            ],
+            "key": "cache.prefill",
+            "value": "on"
+          }
+        ],
+        "policy_ok": false,
+        "policy_violations": [
+          {
+            "code": "approval_required",
+            "message": "write action 'config_change' requires approval"
+          }
+        ],
+        "violations_by_step": [
+          [],
+          [
+            {
+              "code": "approval_required",
+              "message": "write action 'config_change' requires approval"
+            }
+          ]
+        ],
+        "validation": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "validations": [
+      {
+        "plan_id": "rollback-93129553",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "db-pool-93129553",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      },
+      {
+        "plan_id": "cache-warm-93129553",
+        "result": {
+          "status": "UNKNOWN",
+          "before": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "after": {
+            "5xx_rate": null,
+            "latency_p95_ms": null
+          },
+          "kpi_deltas": {},
+          "notes": "Offline heuristic; lower is better for 5xx_rate and latency_p95_ms."
+        }
+      }
+    ],
+    "policy_summary": "5 policy violation(s) across candidates"
+  }
+}

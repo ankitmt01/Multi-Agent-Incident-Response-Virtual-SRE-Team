@@ -1,0 +1,101 @@
+{
+  "results": [
+    {
+      "incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9",
+      "scenario": "rollback_pass",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.177
+    },
+    {
+      "incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83",
+      "scenario": "rollback_pass",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.192
+    },
+    {
+      "incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404",
+      "scenario": "cache_pass",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.223
+    },
+    {
+      "incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33",
+      "scenario": "cache_pass",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.202
+    },
+    {
+      "incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b",
+      "scenario": "no_change_fail",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.203
+    },
+    {
+      "incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9",
+      "scenario": "no_change_fail",
+      "candidates": 3,
+      "policy_ok": 0,
+      "policy_blocked": 3,
+      "validation_pass": 0,
+      "validation_fail": 0,
+      "validation_unknown": 3,
+      "elapsed_sec": 0.19
+    }
+  ],
+  "summary": {
+    "total_runs": 6,
+    "avg_candidates": 3.0,
+    "policy_ok_rate": 0.0,
+    "validation_pass_rate": 0.0,
+    "avg_elapsed_sec": 0.198,
+    "by_scenario": {
+      "rollback_pass": {
+        "runs": 2,
+        "avg_candidates": 3.0,
+        "policy_ok_rate": 0.0,
+        "validation_pass_rate": 0.0,
+        "avg_elapsed_sec": 0.184
+      },
+      "cache_pass": {
+        "runs": 2,
+        "avg_candidates": 3.0,
+        "policy_ok_rate": 0.0,
+        "validation_pass_rate": 0.0,
+        "avg_elapsed_sec": 0.213
+      },
+      "no_change_fail": {
+        "runs": 2,
+        "avg_candidates": 3.0,
+        "policy_ok_rate": 0.0,
+        "validation_pass_rate": 0.0,
+        "avg_elapsed_sec": 0.197
+      }
+    }
+  },
+  "generated_at": "2025-09-12T15:47:29.880606Z"
+}

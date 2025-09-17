@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Incident {{ incident.id }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { --ink:#0f172a; --muted:#64748b; --ok:#16a34a; --err:#dc2626; --border:#e2e8f0; }
+    body{ font-family: ui-sans-serif,system-ui,Segoe UI,Roboto,Inter,sans-serif; margin:24px; color:var(--ink); }
+    h1{ margin:0 0 6px }
+    .muted{ color:var(--muted) }
+    .card{ border:1px solid var(--border); border-radius:12px; padding:16px; margin:16px 0; }
+    table{ width:100%; border-collapse:collapse; font-size:14px }
+    th,td{ text-align:left; padding:8px; border-bottom:1px solid var(--border) }
+    .badge{ display:inline-block; padding:2px 8px; border:1px solid var(--border); border-radius:999px; margin-right:6px; }
+    .ok{ color:var(--ok) } .err{ color:var(--err) }
+    @media print {
+      .no-print { display:none }
+      body{ margin:0 }
+      .card{ break-inside: avoid }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print" style="text-align:right">
+    <button onclick="window.print()">Print</button>
+  </div>
+
+  <h1>Incident Report — {{ incident.id }}</h1>
+  <div class="muted">
+    Service: <b>{{ incident.service }}</b> •
+    Severity: <b>{{ incident.severity }}</b> •
+    Created: <b>{{ incident.created_at }}</b>
+    {% if incident.suspected_cause %} • Suspected cause: <b>{{ incident.suspected_cause }}</b>{% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Evidence</h2>
+    {% if result and result.evidence %}
+    <table>
+      <thead><tr><th>Title</th><th>Score</th><th>Source</th></tr></thead>
+      <tbody>
+        {% for e in result.evidence %}
+        <tr>
+          <td>{{ e.title }}</td>
+          <td>{{ '%.3f'|format(e.score or 0) }}</td>
+          <td>{{ e.source_file or '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <div class="muted">No evidence found.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Candidate Remediations</h2>
+    {% if result and result.candidates %}
+      {% for c in result.candidates %}
+        <h3>{{ c.name }} {% if c.policy_violations %}<span class="badge err">⛔ Policy issues</span>{% else %}<span class="badge ok">✅ Policies OK</span>{% endif %}</h3>
+        <div><b>Rationale:</b> {{ c.rationale }}</div>
+        <div><b>Predicted Impact:</b> {{ c.predicted_impact }}</div>
+        {% if c.policy_violations %}
+          <div><b>Policy Violations:</b>
+            <ul>
+            {% for v in c.policy_violations %}<li>{{ v }}</li>{% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        <div><b>Steps:</b>
+          <ul>
+            {% for s in c.steps %}<li>[{{ s.action_type }}] {{ s.action }}</li>{% endfor %}
+          </ul>
+        </div>
+        <hr/>
+      {% endfor %}
+    {% else %}
+      <div class="muted">No candidates available.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Validation</h2>
+    {% if result and result.validation %}
+      <table>
+        <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Delta</th></tr></thead>
+        <tbody>
+          <tr><td>error_rate</td><td>{{ '%.4f'|format(result.validation.before.error_rate) }}</td><td>{{ '%.4f'|format(result.validation.after.error_rate) }}</td><td>{{ '%.4f'|format(result.validation.kpi_deltas.error_rate) }}</td></tr>
+          <tr><td>p95_ms</td><td>{{ '%.1f'|format(result.validation.before.p95_ms) }}</td><td>{{ '%.1f'|format(result.validation.after.p95_ms) }}</td><td>{{ '%.1f'|format(result.validation.kpi_deltas.p95_ms) }}</td></tr>
+        </tbody>
+      </table>
+      <div>Status: <b>{{ result.validation.status }}</b></div>
+    {% else %}
+      <div class="muted">No validation executed.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Policy Summary</h2>
+    <div>{{ result.policy_summary or 'All policies ✅' }}</div>
+  </div>
+</body>
+</html>

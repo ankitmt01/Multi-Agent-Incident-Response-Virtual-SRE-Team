@@ -1,0 +1,64 @@
+
+
+
+name: agentic-incident-response
+
+services:
+  backend:
+    build:
+      context: .
+    env_file: .env
+    user: "0"
+    environment:
+      - PYTHONPATH=/app
+      - VECTOR_DB_DIR=/var/lib/chroma
+      - COLLECTION_NAME=knowledge_base
+      - CHROMA_TENANT=default_tenant
+      - CHROMA_DATABASE=default_database
+      - KB_MIN_DOCS=0
+      - POSTHOG_DISABLED=true
+      - ANONYMIZED_TELEMETRY=false
+      - CHROMADB_TELEMETRY_ENABLED=false
+      - OTEL_SDK_DISABLED=true
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - .:/app
+      - chroma_data:/var/lib/chroma
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys,urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3); sys.exit(0)"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    depends_on:
+      seed-kb:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  seed-kb:
+    build:
+      context: .
+    env_file: .env
+    user: "0"
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+      - VECTOR_DB_DIR=/var/lib/chroma
+      - COLLECTION_NAME=knowledge_base
+      - CHROMA_DISABLE_TELEMETRY=1
+      - CHROMA_TENANT=default_tenant
+      - CHROMA_DATABASE=default_database
+      - POSTHOG_DISABLED=true
+      - ANONYMIZED_TELEMETRY=false
+      - CHROMADB_TELEMETRY_ENABLED=false
+      - OTEL_SDK_DISABLED=true
+      - KB_GLOB=backend/app/kb/seed/*.md
+    command: ["sh","-lc","set -euxo pipefail; mkdir -p \"$VECTOR_DB_DIR\"; python -m scripts.seed_kb"]
+    volumes:
+      - .:/app
+      - chroma_data:/var/lib/chroma
+    restart: "no"
+
+volumes:
+  chroma_data: {}

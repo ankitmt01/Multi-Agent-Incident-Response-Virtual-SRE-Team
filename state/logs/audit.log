@@ -1,0 +1,180 @@
+{"ts": 1757691086.8141527, "kind": "detect_error", "payload": {"error": "'Signal' object has no attribute 'get'"}}
+{"ts": 1757691089.468034, "kind": "detect_error", "payload": {"error": "'Signal' object has no attribute 'get'"}}
+{"ts": 1757691566.290911, "kind": "detect", "payload": {"incident_id": "9d171299-eecc-48d5-a8c1-28f0918a543e", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691566.3220854, "kind": "approve", "payload": {"incident_id": "9d171299-eecc-48d5-a8c1-28f0918a543e", "approved": true}}
+{"ts": 1757691566.4125264, "kind": "pipeline_start", "payload": {"incident_id": "9d171299-eecc-48d5-a8c1-28f0918a543e", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691583.756462, "kind": "detect", "payload": {"incident_id": "a563099f-0d6e-4680-a6e6-a32ecb10f2fd", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691583.7903209, "kind": "approve", "payload": {"incident_id": "a563099f-0d6e-4680-a6e6-a32ecb10f2fd", "approved": true}}
+{"ts": 1757691583.8206873, "kind": "pipeline_start", "payload": {"incident_id": "a563099f-0d6e-4680-a6e6-a32ecb10f2fd", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691587.6390991, "kind": "pipeline_evidence", "payload": {"incident_id": "9d171299-eecc-48d5-a8c1-28f0918a543e", "count": 0, "top_titles": []}}
+{"ts": 1757691587.6439242, "kind": "pipeline_candidates", "payload": {"incident_id": "9d171299-eecc-48d5-a8c1-28f0918a543e", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691587.9217956, "kind": "pipeline_evidence", "payload": {"incident_id": "a563099f-0d6e-4680-a6e6-a32ecb10f2fd", "count": 0, "top_titles": []}}
+{"ts": 1757691587.9277067, "kind": "pipeline_candidates", "payload": {"incident_id": "a563099f-0d6e-4680-a6e6-a32ecb10f2fd", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691587.956966, "kind": "detect", "payload": {"incident_id": "50449dcf-6145-406f-b9b1-a513e91e8e58", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691587.985911, "kind": "approve", "payload": {"incident_id": "50449dcf-6145-406f-b9b1-a513e91e8e58", "approved": true}}
+{"ts": 1757691588.0293965, "kind": "pipeline_start", "payload": {"incident_id": "50449dcf-6145-406f-b9b1-a513e91e8e58", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757691588.058116, "kind": "pipeline_evidence", "payload": {"incident_id": "50449dcf-6145-406f-b9b1-a513e91e8e58", "count": 0, "top_titles": []}}
+{"ts": 1757691588.0640137, "kind": "pipeline_candidates", "payload": {"incident_id": "50449dcf-6145-406f-b9b1-a513e91e8e58", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691588.0936027, "kind": "detect", "payload": {"incident_id": "991a39f4-52ad-46dc-b3e8-f345bc1b3968", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.1243165, "kind": "approve", "payload": {"incident_id": "991a39f4-52ad-46dc-b3e8-f345bc1b3968", "approved": true}}
+{"ts": 1757691588.1528482, "kind": "pipeline_start", "payload": {"incident_id": "991a39f4-52ad-46dc-b3e8-f345bc1b3968", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.1838746, "kind": "pipeline_evidence", "payload": {"incident_id": "991a39f4-52ad-46dc-b3e8-f345bc1b3968", "count": 0, "top_titles": []}}
+{"ts": 1757691588.1891377, "kind": "pipeline_candidates", "payload": {"incident_id": "991a39f4-52ad-46dc-b3e8-f345bc1b3968", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691588.2469056, "kind": "detect", "payload": {"incident_id": "1450b800-3cd5-49fe-afe0-ef466c429903", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.2788496, "kind": "approve", "payload": {"incident_id": "1450b800-3cd5-49fe-afe0-ef466c429903", "approved": true}}
+{"ts": 1757691588.3060224, "kind": "pipeline_start", "payload": {"incident_id": "1450b800-3cd5-49fe-afe0-ef466c429903", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.3309472, "kind": "pipeline_evidence", "payload": {"incident_id": "1450b800-3cd5-49fe-afe0-ef466c429903", "count": 0, "top_titles": []}}
+{"ts": 1757691588.3361397, "kind": "pipeline_candidates", "payload": {"incident_id": "1450b800-3cd5-49fe-afe0-ef466c429903", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691588.3727307, "kind": "detect", "payload": {"incident_id": "8523587b-b74f-4fce-8a93-358c3d28e61a", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.4068315, "kind": "approve", "payload": {"incident_id": "8523587b-b74f-4fce-8a93-358c3d28e61a", "approved": true}}
+{"ts": 1757691588.4381607, "kind": "pipeline_start", "payload": {"incident_id": "8523587b-b74f-4fce-8a93-358c3d28e61a", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.4648144, "kind": "pipeline_evidence", "payload": {"incident_id": "8523587b-b74f-4fce-8a93-358c3d28e61a", "count": 0, "top_titles": []}}
+{"ts": 1757691588.4689415, "kind": "pipeline_candidates", "payload": {"incident_id": "8523587b-b74f-4fce-8a93-358c3d28e61a", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757691588.530814, "kind": "detect", "payload": {"incident_id": "d2f73b90-5f53-4096-a7a6-72ca2de72eea", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.5659306, "kind": "approve", "payload": {"incident_id": "d2f73b90-5f53-4096-a7a6-72ca2de72eea", "approved": true}}
+{"ts": 1757691588.5974917, "kind": "pipeline_start", "payload": {"incident_id": "d2f73b90-5f53-4096-a7a6-72ca2de72eea", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757691588.6354666, "kind": "pipeline_evidence", "payload": {"incident_id": "d2f73b90-5f53-4096-a7a6-72ca2de72eea", "count": 0, "top_titles": []}}
+{"ts": 1757691588.6426194, "kind": "pipeline_candidates", "payload": {"incident_id": "d2f73b90-5f53-4096-a7a6-72ca2de72eea", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692013.6859317, "kind": "detect", "payload": {"incident_id": "0258789c-3b0e-4892-aa21-0beefaf2df4d", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692013.7201016, "kind": "approve", "payload": {"incident_id": "0258789c-3b0e-4892-aa21-0beefaf2df4d", "approved": true}}
+{"ts": 1757692013.8287275, "kind": "pipeline_start", "payload": {"incident_id": "0258789c-3b0e-4892-aa21-0beefaf2df4d", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692020.085059, "kind": "detect", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692020.1201622, "kind": "approve", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "approved": true}}
+{"ts": 1757692020.1675894, "kind": "pipeline_start", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692024.9410243, "kind": "detect", "payload": {"incident_id": "dd1575f9-d193-40c4-89b2-927f537310ba", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692024.9781785, "kind": "approve", "payload": {"incident_id": "dd1575f9-d193-40c4-89b2-927f537310ba", "approved": true}}
+{"ts": 1757692025.013988, "kind": "pipeline_start", "payload": {"incident_id": "dd1575f9-d193-40c4-89b2-927f537310ba", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692029.7837174, "kind": "detect", "payload": {"incident_id": "be7e9c21-4ab0-4dd5-9af0-bf8d9d5aa890", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692029.818325, "kind": "approve", "payload": {"incident_id": "be7e9c21-4ab0-4dd5-9af0-bf8d9d5aa890", "approved": true}}
+{"ts": 1757692029.852673, "kind": "pipeline_start", "payload": {"incident_id": "be7e9c21-4ab0-4dd5-9af0-bf8d9d5aa890", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692034.896262, "kind": "pipeline_evidence", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "count": 0, "top_titles": []}}
+{"ts": 1757692034.9056654, "kind": "pipeline_candidates", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692034.9184906, "kind": "pipeline_validate", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "plan_id": "rollback-a381ac1e", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692034.9282951, "kind": "pipeline_validate", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "plan_id": "db-pool-a381ac1e", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692034.945106, "kind": "pipeline_validate", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "plan_id": "cache-warm-a381ac1e", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692034.9493732, "kind": "pipeline_end", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f"}}
+{"ts": 1757692034.953701, "kind": "run", "payload": {"incident_id": "a381ac1e-16cb-4114-bfb8-d1dfad339e4f", "approved": true}}
+{"ts": 1757692043.0291336, "kind": "detect", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692043.0667315, "kind": "approve", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "approved": true}}
+{"ts": 1757692043.0942278, "kind": "pipeline_start", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692043.1191761, "kind": "pipeline_evidence", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "count": 0, "top_titles": []}}
+{"ts": 1757692043.1240165, "kind": "pipeline_candidates", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692043.136147, "kind": "pipeline_validate", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "plan_id": "rollback-cb445018", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692043.1461105, "kind": "pipeline_validate", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "plan_id": "db-pool-cb445018", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692043.1557057, "kind": "pipeline_validate", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "plan_id": "cache-warm-cb445018", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692043.1604145, "kind": "pipeline_end", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454"}}
+{"ts": 1757692043.1647766, "kind": "run", "payload": {"incident_id": "cb445018-ea39-4944-9a0a-174df643a454", "approved": true}}
+{"ts": 1757692049.412019, "kind": "detect", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692049.4406626, "kind": "approve", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "approved": true}}
+{"ts": 1757692049.468894, "kind": "pipeline_start", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692049.495637, "kind": "pipeline_evidence", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "count": 0, "top_titles": []}}
+{"ts": 1757692049.5008006, "kind": "pipeline_candidates", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692049.5112865, "kind": "pipeline_validate", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "plan_id": "rollback-cbd6bb37", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.5203915, "kind": "pipeline_validate", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "plan_id": "db-pool-cbd6bb37", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.529506, "kind": "pipeline_validate", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "plan_id": "cache-warm-cbd6bb37", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.5342832, "kind": "pipeline_end", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9"}}
+{"ts": 1757692049.538274, "kind": "run", "payload": {"incident_id": "cbd6bb37-3dcf-4bd0-a327-9c1612c1dad9", "approved": true}}
+{"ts": 1757692049.5717585, "kind": "detect", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692049.6207676, "kind": "approve", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "approved": true}}
+{"ts": 1757692049.6509423, "kind": "pipeline_start", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1757692049.6767216, "kind": "pipeline_evidence", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "count": 0, "top_titles": []}}
+{"ts": 1757692049.6825693, "kind": "pipeline_candidates", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692049.6930175, "kind": "pipeline_validate", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "plan_id": "rollback-459d1deb", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.7018778, "kind": "pipeline_validate", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "plan_id": "db-pool-459d1deb", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.7115247, "kind": "pipeline_validate", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "plan_id": "cache-warm-459d1deb", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.7155418, "kind": "pipeline_end", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83"}}
+{"ts": 1757692049.7195222, "kind": "run", "payload": {"incident_id": "459d1deb-47b9-4ad6-bafe-76b2e4941e83", "approved": true}}
+{"ts": 1757692049.7878132, "kind": "detect", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692049.8254836, "kind": "approve", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "approved": true}}
+{"ts": 1757692049.8730738, "kind": "pipeline_start", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692049.8990502, "kind": "pipeline_evidence", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "count": 0, "top_titles": []}}
+{"ts": 1757692049.904498, "kind": "pipeline_candidates", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692049.9158547, "kind": "pipeline_validate", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "plan_id": "rollback-6e8f77fe", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.9255657, "kind": "pipeline_validate", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "plan_id": "db-pool-6e8f77fe", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.9356036, "kind": "pipeline_validate", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "plan_id": "cache-warm-6e8f77fe", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692049.9395816, "kind": "pipeline_end", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404"}}
+{"ts": 1757692049.9433618, "kind": "run", "payload": {"incident_id": "6e8f77fe-9c1c-4ed2-8b18-e5b8f1109404", "approved": true}}
+{"ts": 1757692049.9779882, "kind": "detect", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.0125482, "kind": "approve", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "approved": true}}
+{"ts": 1757692050.0656931, "kind": "pipeline_start", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.0923688, "kind": "pipeline_evidence", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "count": 0, "top_titles": []}}
+{"ts": 1757692050.0976288, "kind": "pipeline_candidates", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692050.108487, "kind": "pipeline_validate", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "plan_id": "rollback-5d77a3c6", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.1185725, "kind": "pipeline_validate", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "plan_id": "db-pool-5d77a3c6", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.1279173, "kind": "pipeline_validate", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "plan_id": "cache-warm-5d77a3c6", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.1316953, "kind": "pipeline_end", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33"}}
+{"ts": 1757692050.1357539, "kind": "run", "payload": {"incident_id": "5d77a3c6-32e9-48d2-ab6c-dee55426db33", "approved": true}}
+{"ts": 1757692050.1778438, "kind": "detect", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.211705, "kind": "approve", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "approved": true}}
+{"ts": 1757692050.2478573, "kind": "pipeline_start", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.2792974, "kind": "pipeline_evidence", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "count": 0, "top_titles": []}}
+{"ts": 1757692050.284629, "kind": "pipeline_candidates", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692050.295602, "kind": "pipeline_validate", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "plan_id": "rollback-132f57ae", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.3081844, "kind": "pipeline_validate", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "plan_id": "db-pool-132f57ae", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.3199468, "kind": "pipeline_validate", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "plan_id": "cache-warm-132f57ae", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.3253143, "kind": "pipeline_end", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b"}}
+{"ts": 1757692050.3304513, "kind": "run", "payload": {"incident_id": "132f57ae-db6c-41cd-bb3c-f1e17abdd20b", "approved": true}}
+{"ts": 1757692050.3809636, "kind": "detect", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.4163744, "kind": "approve", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "approved": true}}
+{"ts": 1757692050.4510198, "kind": "pipeline_start", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "service": "checkout", "severity": "MEDIUM"}}
+{"ts": 1757692050.4790492, "kind": "pipeline_evidence", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "count": 0, "top_titles": []}}
+{"ts": 1757692050.4839296, "kind": "pipeline_candidates", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1757692050.4946146, "kind": "pipeline_validate", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "plan_id": "rollback-af0ffbef", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.5050266, "kind": "pipeline_validate", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "plan_id": "db-pool-af0ffbef", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.515334, "kind": "pipeline_validate", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "plan_id": "cache-warm-af0ffbef", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1757692050.5199497, "kind": "pipeline_end", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9"}}
+{"ts": 1757692050.5246804, "kind": "run", "payload": {"incident_id": "af0ffbef-d0fa-42cd-a445-95c80694c0c9", "approved": true}}
+{"ts": 1758056287.6275654, "kind": "detect", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056319.9488876, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056321.9148042, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056327.8858187, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056327.8856914, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056327.8883126, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056327.8882194, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056327.895718, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.8958507, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.902872, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.902702, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.9106278, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.910755, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056327.9135697, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056327.9134617, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056327.9154108, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758056327.9154365, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758056333.29681, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056333.3235343, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056333.3283203, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056333.339295, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056333.34839, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056333.3600671, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056333.3657684, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056333.3711429, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758056337.060357, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056337.0887887, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056337.0941792, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056337.1053817, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.1160126, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.1280415, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.1340084, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056337.1395307, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758056337.870645, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056337.900376, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056337.9057462, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056337.9174242, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.9299312, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.9407952, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056337.9462683, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056337.951538, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758056338.6757872, "kind": "pipeline_start", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758056338.700447, "kind": "pipeline_evidence", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 0, "top_titles": []}}
+{"ts": 1758056338.7055852, "kind": "pipeline_candidates", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "count": 3, "ok": 0, "violating": 3}}
+{"ts": 1758056338.7170403, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "rollback-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056338.7279453, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "db-pool-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056338.7401853, "kind": "pipeline_validate", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "plan_id": "cache-warm-93129553", "status": "UNKNOWN", "deltas": null}}
+{"ts": 1758056338.7453554, "kind": "pipeline_end", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9"}}
+{"ts": 1758056338.7505248, "kind": "run", "payload": {"incident_id": "93129553-5f3f-432f-972f-d728464b56e9", "approved": false}}
+{"ts": 1758060688.9994352, "kind": "detect", "payload": {"incident_id": "65276a8a-65d1-4d5c-89de-9deb6bf381f0", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758060692.4035146, "kind": "approve", "payload": {"incident_id": "65276a8a-65d1-4d5c-89de-9deb6bf381f0", "approved": true}}
+{"ts": 1758131175.2761216, "kind": "approve", "payload": {"incident_id": "65276a8a-65d1-4d5c-89de-9deb6bf381f0", "approved": true}}
+{"ts": 1758131178.3985662, "kind": "detect", "payload": {"incident_id": "e1950550-0719-424a-999a-7d9a2d65d950", "service": "checkout", "severity": "HIGH"}}
+{"ts": 1758131313.6001916, "kind": "detect", "payload": {"incident_id": "45a24ddd-c789-4d04-b21d-0d94f39a4c0b", "service": "checkout", "severity": "HIGH"}}
